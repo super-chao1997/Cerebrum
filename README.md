@@ -1,1 +1,1 @@
-# Cerebrum: Agent Development SDK for AIOS
+# Cerebrum: Agent SDK for AIOS

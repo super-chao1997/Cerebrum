@@ -135,6 +135,7 @@ class AgentManager:
 
     def _get_agent_metadata(self, folder_path: str) -> Dict[str, str]:
         config_path = os.path.join(folder_path, "config.json")
+        print(config_path, 'path_fdsfs')
         if os.path.exists(config_path):
             with open(config_path, "r") as f:
                 return json.load(f)
@@ -245,6 +246,7 @@ class AgentManager:
         temp_dir = self.cache_dir / "temp" / f"{author}_{name}_{version}"
         temp_dir.mkdir(parents=True, exist_ok=True)
 
+
         # Extract agent files to the temporary directory
         for filename, content in agent_package.files.items():
             file_path = temp_dir / filename
@@ -259,13 +261,17 @@ class AgentManager:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
+        with open(temp_dir / 'config.json', "r") as f:
+            config_ = json.load(f)
+
         # Remove the temporary directory from sys.path
         sys.path.pop(0)
 
         # Get the agent class
         agent_class = getattr(module, module_name)
  
-        return agent_class, agent_package.get_config()
+        # return agent_class, agent_package.get_config()
+        return agent_class, config_
 
 
 if __name__ == '__main__':

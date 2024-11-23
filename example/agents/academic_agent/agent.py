@@ -3,8 +3,8 @@ from cerebrum.llm.communication import LLMQuery
 import json
 
 class AcademicAgent(BaseAgent):
-    def __init__(self, agent_name, task_input):
-        super().__init__(agent_name, task_input)
+    def __init__(self, agent_name, task_input, config_):
+        super().__init__(agent_name, task_input, config_)
 
         self.plan_max_fail_times = 3
         self.tool_call_max_fail_times = 3

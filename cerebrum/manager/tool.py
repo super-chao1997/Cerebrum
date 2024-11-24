@@ -30,7 +30,6 @@ class ToolManager:
         """Package a tool from a folder into a transportable format."""
         tool_files = self._get_tool_files(folder_path)
         metadata = self._get_tool_metadata(folder_path)
-        print(metadata)
         
         # Validate required tool metadata
         # required_fields = ['name', 'version', 'author']

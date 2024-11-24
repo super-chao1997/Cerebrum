@@ -9,6 +9,7 @@ import requests
 from pathlib import Path
 import platformdirs
 import importlib.util
+import uuid
 
 from cerebrum.manager.package import AgentPackage
 from cerebrum.utils.manager import get_newest_version
@@ -96,6 +97,26 @@ class AgentManager:
 
     def _get_cache_path(self, author: str, name: str, version: str) -> Path:
         return self.cache_dir / author / name / f"{self._version_to_path(version)}.agent"
+    
+    def _get_random_cache_path(self):
+        """
+        Creates a randomly named folder inside the cache/cerebrum directory and returns its path.
+        Uses platformdirs for correct cross-platform cache directory handling.
+        """
+        # Get the user cache directory using platformdirs
+        cache_dir = platformdirs.user_cache_dir(appname="cerebrum")
+        
+        # Generate a random UUID for the folder name
+        random_name = str(uuid.uuid4())
+        
+        # Create the full path
+        random_folder_path = os.path.join(cache_dir, random_name)
+        
+        # Create the directory and any necessary parent directories
+        os.makedirs(random_folder_path, exist_ok=True)
+        
+        return Path(random_folder_path) / f"local.agent"
+
 
     def _save_agent_to_cache(self, agent_data: Dict, cache_path: Path):
         agent_package = AgentPackage(cache_path)
@@ -228,7 +249,10 @@ class AgentManager:
                 print(f"Agent {author}/{name} (v{version}) not found in cache. Downloading...")
                 self.download_agent(author, name, version)
         else:
-            agent_path = path
+            local_agent_data = self.package_agent(path)
+            random_path = self._get_random_cache_path()
+            self._save_agent_to_cache(local_agent_data, random_path)
+            agent_path = f"{random_path}"
 
 
         agent_package = AgentPackage(agent_path)

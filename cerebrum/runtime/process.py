@@ -37,8 +37,7 @@ class RunnableAgent:
 class AgentProcessor:
     @staticmethod
     def process_response(query: Query, llm: Any):
-        print(query)
-        print(llm)
+
         return llm.execute(query)
 
     @staticmethod

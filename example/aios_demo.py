@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
         client.connect()
 
-        result = client.execute("example/academic_agent", {
+        result = client.execute("/Users/rama2r/Cerebrum/example/agents/academic_agent", {
             "task": "Tell me what is the prollm paper mainly about? ",
         })
 

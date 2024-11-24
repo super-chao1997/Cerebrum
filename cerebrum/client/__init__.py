@@ -32,7 +32,7 @@ class Cerebrum:
         result = self._post("/query", {
             'query_type': 'llm',
             'agent_name': agent_name,
-            'query_data': asdict(query)})
+            'query_data': query.model_dump()})
 
         return result
 

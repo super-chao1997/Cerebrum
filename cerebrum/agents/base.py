@@ -12,7 +12,8 @@ class BaseAgent:
         self.config = config_
 
         config.global_client = Cerebrum()
-        self.send_request = AutoLLM.from_dynamic().process
+        # self.send_request = AutoLLM.from_dynamic().process
+        self.send_request = None
 
         self.tools, self.tool_info = AutoTool.from_batch_preload(self.config["tools"]).values()
 

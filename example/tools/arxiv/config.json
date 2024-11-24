@@ -5,11 +5,11 @@
     ],
     "meta": {
         "author": "example",
-        "version": "1.0.2",
+        "version": "1.0.4",
         "license": "CC0"
     },
     "build": {
-        "entry": "arxiv.py",
+        "entry": "tool.py",
         "module": "Arxiv"
     }
 }

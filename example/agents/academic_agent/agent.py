@@ -117,57 +117,113 @@ class AcademicAgent(BaseAgent):
                 "content": f"[Thinking]: The workflow generated for the problem is {json.dumps(workflow)}. Follow the workflow to solve the problem step by step. ",
             }
         )
+        
+        if workflow:
+            final_result = ""
 
-        try:
-            if workflow:
-                final_result = ""
+            for i, step in enumerate(workflow):
+                action_type = step["action_type"]
+                action = step["action"]
+                tool_use = step["tool_use"]
 
-                for i, step in enumerate(workflow):
-                    action_type = step["action_type"]
-                    action = step["action"]
-                    tool_use = step["tool_use"]
+                prompt = f"At step {i + 1}, you need to: {action}. "
+                self.messages.append({"role": "user", "content": prompt})
 
-                    prompt = f"At step {i + 1}, you need to: {action}. "
-                    self.messages.append({"role": "user", "content": prompt})
+                if tool_use:
+                    selected_tools = self.pre_select_tools(tool_use)
 
-                    if tool_use:
-                        selected_tools = self.pre_select_tools(tool_use)
+                else:
+                    selected_tools = None
 
-                    else:
-                        selected_tools = None
+                print('aaa')
 
-                    response = self.send_request(
-                        agent_name=self.agent_name,
-                        query=LLMQuery(
-                            messages=self.messages,
-                            tools=selected_tools,
-                            action_type=action_type,
-                        ),
-                    )["response"]
+                response = self.send_request(
+                    agent_name=self.agent_name,
+                    query=LLMQuery(
+                        messages=self.messages,
+                        tools=selected_tools,
+                        action_type=action_type,
+                    ),
+                )
+
+                print('type', type(response))
+
+                response = response["response"]
+
+                print('bbb')
                     
-                    self.messages.append({"role": "assistant", "content": response.response_message})
+                self.messages.append({"role": "assistant", "content": response.response_message})
 
-                    self.rounds += 1
+                self.rounds += 1
 
                 # print(final_result)
-                final_result = self.messages[-1]["content"]
+            final_result = self.messages[-1]["content"]
                 
-                print(final_result)
-                return {
-                    "agent_name": self.agent_name,
-                    "result": final_result,
-                    "rounds": self.rounds,
-                }
+            print(final_result)
+            return {
+                "agent_name": self.agent_name,
+                "result": final_result,
+                "rounds": self.rounds,
+            }
 
-            else:
-                return {
-                    "agent_name": self.agent_name,
-                    "result": "Failed to generate a valid workflow in the given times.",
-                    "rounds": self.rounds,
+        else:
+            return {
+                "agent_name": self.agent_name,
+                "result": "Failed to generate a valid workflow in the given times.",
+                "rounds": self.rounds,
 
-                }
+            }
+
+        # try:
+        #     if workflow:
+        #         final_result = ""
+
+        #         for i, step in enumerate(workflow):
+        #             action_type = step["action_type"]
+        #             action = step["action"]
+        #             tool_use = step["tool_use"]
+
+        #             prompt = f"At step {i + 1}, you need to: {action}. "
+        #             self.messages.append({"role": "user", "content": prompt})
+
+        #             if tool_use:
+        #                 selected_tools = self.pre_select_tools(tool_use)
+
+        #             else:
+        #                 selected_tools = None
+
+        #             response = self.send_request(
+        #                 agent_name=self.agent_name,
+        #                 query=LLMQuery(
+        #                     messages=self.messages,
+        #                     tools=selected_tools,
+        #                     action_type=action_type,
+        #                 ),
+        #             )["response"]
+                    
+        #             self.messages.append({"role": "assistant", "content": response.response_message})
+
+        #             self.rounds += 1
+
+        #         # print(final_result)
+        #         final_result = self.messages[-1]["content"]
                 
-        except Exception as e:
+        #         print(final_result)
+        #         return {
+        #             "agent_name": self.agent_name,
+        #             "result": final_result,
+        #             "rounds": self.rounds,
+        #         }
 
-            return {}
+        #     else:
+        #         return {
+        #             "agent_name": self.agent_name,
+        #             "result": "Failed to generate a valid workflow in the given times.",
+        #             "rounds": self.rounds,
+
+        #         }
+                
+        # except Exception as e:
+        #     print(e)
+        #     return {}
 

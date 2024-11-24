@@ -126,13 +126,29 @@ class ToolManager:
                 file_path.parent.mkdir(parents=True, exist_ok=True)
                 file_path.write_bytes(content)
 
-            # Add to Python path and load module
+            current_path = str(Path.cwd())
+            if current_path not in sys.path:
+                sys.path.insert(0, current_path)
+            
+            # Then add the temp directory
             sys.path.insert(0, str(temp_dir))
             
             try:
-                # Load the module
-                spec = importlib.util.spec_from_file_location(module_name, str(temp_dir / entry_point))
+                # Ensure all required packages are accessible
+                importlib.invalidate_caches()
+                
+                # Load the module with full system context
+                spec = importlib.util.spec_from_file_location(
+                    module_name, 
+                    str(temp_dir / entry_point),
+                    submodule_search_locations=[str(temp_dir)] + sys.path
+                )
                 module = importlib.util.module_from_spec(spec)
+                
+                # Add module to sys.modules before execution
+                sys.modules[module_name] = module
+                
+                # Execute the module
                 spec.loader.exec_module(module)
 
                 # Get the tool class
@@ -141,7 +157,13 @@ class ToolManager:
                 return tool_class, tool_package.get_config()
             finally:
                 # Clean up
-                sys.path.pop(0)
+                sys.path.pop(0)  # Remove temp_dir
+                if current_path == sys.path[0]:
+                    sys.path.pop(0)  # Remove current_path if we added it
+                
+                # Remove from sys.modules to prevent caching issues
+                if module_name in sys.modules:
+                    del sys.modules[module_name]
         else:
             module = importlib.import_module(f"cerebrum.tool.core.{PATHS[name].get('module_name')}")
             tool = getattr(module, PATHS[name].get('class_name'))

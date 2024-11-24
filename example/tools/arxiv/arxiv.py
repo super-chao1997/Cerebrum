@@ -3,6 +3,56 @@ from cerebrum.tool.base import BaseTool
 import arxiv
 from typing import Optional
 
+def check_module(module_name, attribute_name=None):
+    """
+    Check if a module is installed, optionally verify an attribute exists,
+    and display its version if available.
+    
+    Args:
+        module_name (str): Name of the module to check
+        attribute_name (str, optional): Name of the attribute to check for
+    
+    Returns:
+        bool: True if all checks pass, False otherwise
+    """
+    try:
+        # Attempt to import the module
+        module = __import__(module_name)
+        print(f"✓ Module '{module_name}' is installed")
+        
+        # Check for version information
+        version_attrs = ['__version__', 'version', 'VERSION', '__VERSION__']
+        version_found = False
+        
+        for attr in version_attrs:
+            try:
+                version = getattr(module, attr)
+                print(f"✓ Version: {version}")
+                version_found = True
+                break
+            except AttributeError:
+                continue
+        
+        if not version_found:
+            print("? Version information not found")
+        
+        # Check for specific attribute if requested
+        if attribute_name:
+            if hasattr(module, attribute_name):
+                attr = getattr(module, attribute_name)
+                print(f"✓ Attribute '{attribute_name}' exists")
+                print(f"  Type: {type(attr).__name__}")
+                return True
+            else:
+                print(f"✗ Attribute '{attribute_name}' not found")
+                return False
+        
+        return True
+        
+    except ImportError:
+        print(f"✗ Module '{module_name}' is not installed")
+        return False
+
 class Arxiv(BaseTool):
     """Arxiv Tool, refactored from Langchain.
     To use, you should have the ``arxiv`` python package installed.
@@ -29,6 +79,10 @@ class Arxiv(BaseTool):
     """
     def __init__(self):
         super().__init__()
+        
+        check_module("arxiv", "Search")
+        print("\n" + "-"*40 + "\n")
+
         self.top_k_results: int = 3
         self.ARXIV_MAX_QUERY_LENGTH: int = 300
         self.load_max_docs: int = 100

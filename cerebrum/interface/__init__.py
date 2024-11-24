@@ -34,7 +34,9 @@ class AutoTool:
             tool, _ = cls.TOOL_MANAGER.load_tool(author, name, version)
         else:
             tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name)
-        return tool
+        
+        #return tool instance, not class
+        return tool()
     
     @classmethod
     def from_batch_preload(cls, tool_names: list[str]):

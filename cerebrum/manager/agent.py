@@ -29,8 +29,6 @@ class AgentManager:
 
     def package_agent(self, folder_path: str) -> Dict:
         agent_files = self._get_agent_files(folder_path)
-        print(folder_path)
-        print(agent_files)
         metadata = self._get_agent_metadata(folder_path)
 
         return {
@@ -80,7 +78,6 @@ class AgentManager:
 
         actual_version = agent_data.get('version', version)
         cache_path = self._get_cache_path(author, name, actual_version)
-        print(cache_path)
 
         self._save_agent_to_cache(agent_data, cache_path)
         print(
@@ -101,7 +98,6 @@ class AgentManager:
         return self.cache_dir / author / name / f"{self._version_to_path(version)}.agent"
 
     def _save_agent_to_cache(self, agent_data: Dict, cache_path: Path):
-        print(agent_data)
         agent_package = AgentPackage(cache_path)
         agent_package.metadata = {
             "author": agent_data["author"],
@@ -135,7 +131,6 @@ class AgentManager:
 
     def _get_agent_metadata(self, folder_path: str) -> Dict[str, str]:
         config_path = os.path.join(folder_path, "config.json")
-        print(config_path, 'path_fdsfs')
         if os.path.exists(config_path):
             with open(config_path, "r") as f:
                 return json.load(f)

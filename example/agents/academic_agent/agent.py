@@ -149,10 +149,9 @@ class AcademicAgent(BaseAgent):
 
                     self.rounds += 1
 
-                # print(final_result)
+
                 final_result = self.messages[-1]["content"]
                 
-                print(final_result)
                 return {
                     "agent_name": self.agent_name,
                     "result": final_result,

@@ -8,14 +8,14 @@ The goal of AIOS is to build a Large Language Model (LLM) agent operating system
 
 ## 🏠 Cerebrum Architecture
 <p align="center">
-<img src="docs/assets/aios-figs/architecture.jpg">
+<img src="docs/assets/sdk.png">
 </p>
 
-
-AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The kernel facilitates the installation, execution and usage of agents. Furthermore, the AIOS SDK facilitates the development and deployment of agents.
+The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the AIOS kernel.
+AIOS kernel is the current repository and AIOS-Agent SDK can be found at [here](https://github.com/agiresearch/Cerebrum). 
 
 ## 📰 News
-- **[2024-11-026]** 🔥 Cerebrum is available for public release on PyPi!
+- **[2024-11-26]** 🔥 Cerebrum is available for public release on PyPI!
 
 ## Installation
 
@@ -135,16 +135,16 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 | Groq | Gemma 2B | ✅ | gemma2-9b-it |groq|
 | Groq | Llama3 Groq 70B | ✅ | llama3-groq-70b-8192-tool-use-preview |groq|
 | Groq | Llama3 Groq 8B | ✅ | llama3-groq-8b-8192-tool-use-preview |groq|
-| Ollama[^bignote1] | All Models | ✅ | model-name |ollama|
-| VLLM[^bignote2] | All Models | ✅ | model-name |vllm|
+| ollama[^bignote1] | All Models | ✅ | model-name |ollama|
+| vLLM[^bignote2] | All Models | ✅ | model-name |vllm|
 | HuggingFace[^bignote3] | All Models | ✅ | model-name |huggingface|
 
-[^bignote1]: **Ollama Model String Format:**
+[^bignote1]: **ollama Model String Format:**
       - Format: `model-name`. Some examples are `llama2`, `mistral`, or `codellama`.
       - Ollama allows you to run models locally using their CLI tool and API
-      - See AIOS documentation for setting up Ollama
+      - See AIOS documentation for setting up ollama
 
-[^bignote2]: **VLLM Model String Format:**
+[^bignote2]: **vLLM Model String Format:**
      - Format: `model-name`. Some examples are `mistral-7b-instruct`, `llama2-70b`, or `mixtral-8x7b`.
      - VLLM is a high-performance inference engine that can serve any HuggingFace model
      - You can specify custom model paths: `vllm/path/to/your/model`

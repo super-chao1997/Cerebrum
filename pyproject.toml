@@ -42,7 +42,7 @@ files = ["requirements.txt"]
 
 [project.scripts]
 aios-basic-demo = "cerebrum.example.aios_demo:main"
-aios-concurrent-demo = "cerebrum.example.aios_demo_concurrent"
+aios-concurrent-demo = "cerebrum.example.aios_demo_concurrent:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

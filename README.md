@@ -8,7 +8,7 @@ The goal of AIOS is to build a Large Language Model (LLM) agent operating system
 
 ## 🏠 Cerebrum Architecture
 <p align="center">
-<img src="docs/assets/sdk.png">
+<img src="docs/assets/cerebrum.png">
 </p>
 
 The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the AIOS kernel.

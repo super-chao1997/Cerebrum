@@ -41,52 +41,52 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 
 ### Supported LLM Cores
 
-| Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ |
-|:------------|:-------------|:---------------|:---------------|
-| Anthropic | Claude 3.5 Sonnet | ❌ | claude-3-5-sonnet-20241022 |
-| Anthropic | Claude 3.5 Haiku | ❌ | claude-3-5-haiku-20241022 |
-| Anthropic | Claude 3 Opus | ❌ | claude-3-opus-20240229 |
-| Anthropic | Claude 3 Sonnet | ❌ | claude-3-sonnet-20240229 |
-| Anthropic | Claude 3 Haiku | ❌ | claude-3-haiku-20240307 |
-| OpenAI | GPT-4 | ❌ | gpt-4 |
-| OpenAI | GPT-4 Turbo | ❌ | gpt-4-turbo |
-| OpenAI | GPT-4o | ❌ | gpt-4o |
-| OpenAI | GPT-4o mini | ❌ | gpt-4o-mini |
-| OpenAI | GPT-3.5 Turbo | ❌ | gpt-3.5-turbo |
-| Google | Gemini 1.5 Flash | ❌ | gemini-1.5-flash |
-| Google | Gemini 1.5 Flash-8B | ❌ | gemini-1.5-flash-8b |
-| Google | Gemini 1.5 Pro | ❌ | gemini-1.5-pro |
-| Google | Gemini 1.0 Pro | ❌ | gemini-1.0-pro |
-| Groq | Llama 3.2 90B Vision | ✅ | llama-3.2-90b-vision-preview |
-| Groq | Llama 3.2 11B Vision | ✅ | llama-3.2-11b-vision-preview |
-| Groq | Llama 3.1 70B | ✅ | llama-3.1-70b-versatile |
-| Groq | Llama Guard 3 8B | ✅ | llama-guard-3-8b |
-| Groq | Llama 3 70B | ✅ | llama3-70b-8192 |
-| Groq | Llama 3 8B | ✅ | llama3-8b-8192 |
-| Groq | Mixtral 8x7B | ✅ | mixtral-8x7b-32768 |
-| Groq | Gemma 7B | ✅ | gemma-7b-it |
-| Groq | Gemma 2B | ✅ | gemma2-9b-it |
-| Groq | Llama3 Groq 70B | ✅ | llama3-groq-70b-8192-tool-use-preview |
-| Groq | Llama3 Groq 8B | ✅ | llama3-groq-8b-8192-tool-use-preview |
-| Ollama[^bignote1] | All Models | ✅ | ollama/model-name |
-| VLLM[^bignote2] | All Models | ✅ | vllm/model-name |
-| HuggingFace[^bignote3] | All Models | ✅ | huggingface/model-name |
+| Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ | Backend ⚙️ |
+|:------------|:-------------|:---------------|:---------------|:---------------|
+| Anthropic | Claude 3.5 Sonnet | ❌ | claude-3-5-sonnet-20241022 |anthropic |
+| Anthropic | Claude 3.5 Haiku | ❌ | claude-3-5-haiku-20241022 |anthropic |
+| Anthropic | Claude 3 Opus | ❌ | claude-3-opus-20240229 |anthropic |
+| Anthropic | Claude 3 Sonnet | ❌ | claude-3-sonnet-20240229 |anthropic |
+| Anthropic | Claude 3 Haiku | ❌ | claude-3-haiku-20240307 |anthropic |
+| OpenAI | GPT-4 | ❌ | gpt-4 |openai|
+| OpenAI | GPT-4 Turbo | ❌ | gpt-4-turbo |openai|
+| OpenAI | GPT-4o | ❌ | gpt-4o |openai|
+| OpenAI | GPT-4o mini | ❌ | gpt-4o-mini |openai|
+| OpenAI | GPT-3.5 Turbo | ❌ | gpt-3.5-turbo |openai|
+| Google | Gemini 1.5 Flash | ❌ | gemini-1.5-flash |google|
+| Google | Gemini 1.5 Flash-8B | ❌ | gemini-1.5-flash-8b |google|
+| Google | Gemini 1.5 Pro | ❌ | gemini-1.5-pro |google|
+| Google | Gemini 1.0 Pro | ❌ | gemini-1.0-pro |google|
+| Groq | Llama 3.2 90B Vision | ✅ | llama-3.2-90b-vision-preview |groq|
+| Groq | Llama 3.2 11B Vision | ✅ | llama-3.2-11b-vision-preview |groq|
+| Groq | Llama 3.1 70B | ✅ | llama-3.1-70b-versatile |groq|
+| Groq | Llama Guard 3 8B | ✅ | llama-guard-3-8b |groq|
+| Groq | Llama 3 70B | ✅ | llama3-70b-8192 |groq|
+| Groq | Llama 3 8B | ✅ | llama3-8b-8192 |groq|
+| Groq | Mixtral 8x7B | ✅ | mixtral-8x7b-32768 |groq|
+| Groq | Gemma 7B | ✅ | gemma-7b-it |groq|
+| Groq | Gemma 2B | ✅ | gemma2-9b-it |groq|
+| Groq | Llama3 Groq 70B | ✅ | llama3-groq-70b-8192-tool-use-preview |groq|
+| Groq | Llama3 Groq 8B | ✅ | llama3-groq-8b-8192-tool-use-preview |groq|
+| Ollama[^bignote1] | All Models | ✅ | model-name |ollama|
+| VLLM[^bignote2] | All Models | ✅ | model-name |vllm|
+| HuggingFace[^bignote3] | All Models | ✅ | model-name |huggingface|
 
 [^bignote1]: **Ollama Model String Format:**
-      - Format: `ollama/model-name`. Some examples are `ollama/llama2`, `ollama/mistral`, or `ollama/codellama`.
+      - Format: `model-name`. Some examples are `llama2`, `mistral`, or `codellama`.
       - Ollama allows you to run models locally using their CLI tool and API
       - See AIOS documentation for setting up Ollama
 
 [^bignote2]: **VLLM Model String Format:**
-     - Format: `vllm/model-name`. Some examples are `vllm/mistral-7b-instruct`, `vllm/llama2-70b`, or `vllm/mixtral-8x7b`.
+     - Format: `model-name`. Some examples are `mistral-7b-instruct`, `llama2-70b`, or `mixtral-8x7b`.
      - VLLM is a high-performance inference engine that can serve any HuggingFace model
      - You can specify custom model paths: `vllm/path/to/your/model`
      - Supports quantization parameters: `vllm/mistral-7b-instruct-4bit`
      - See AIOS documentation for setting up VLLM
 
 [^bignote3]: **HuggingFace Model String Format:**
-     - Format: `huggingface/owner/model-name`. Some examples are `huggingface/mistralai/Mistral-7B-v0.1`, `huggingface/meta-llama/Llama-2-70b-hf`, or `huggingface/TheBloke/Llama-2-13B-GPTQ`.
-     - Can include specific versions: `huggingface/owner/model-name@v1.0`
+     - Format: `owner/model-name`. Some examples are `mistralai/Mistral-7B-v0.1`, `meta-llama/Llama-2-70b-hf`, or `TheBloke/Llama-2-13B-GPTQ`.
+     - Can include specific versions: `owner/model-name@v1.0`
      - Supports multiple model formats (PyTorch, Safetensors, GGUF, GPTQ)
      - Can reference private models with auth token: `huggingface/username/private-model`
      - See AIOS documentation for setting up HuggingFace (if necessary)

@@ -6,13 +6,11 @@
 
 The goal of AIOS is to build a Large Language Model (LLM) agent operating system, which intends to embed large language model into the operating system as the brain of the OS. AIOS is designed to address problems (e.g., scheduling, context switch, memory management, etc.) during the development and deployment of LLM-based agents, for a better ecosystem among agent developers and users.
 
-## 🏠 Architecture of Cerebrum
+## 🏠 Cerebrum Architecture
 <p align="center">
 <img src="docs/assets/aios-figs/architecture.jpg">
 </p>
-<p align="center">
-<img src="docs/assets/aios-figs/scheduler.jpg">
-</p>
+
 
 AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The kernel facilitates the installation, execution and usage of agents. Furthermore, the AIOS SDK facilitates the development and deployment of agents.
 
@@ -38,6 +36,20 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 
 1. **Start the AIOS Kernel** 
    📝 See [here](https://aios-3.gitbook.io/aios-docs/getting-started/installation).
+
+2. **Run the AIOS Basic Demo**
+   ```bash
+   aios-basic-demo
+   ```
+
+   Code file is located at `example/aios_demo.py`
+
+3. **Run the AIOS Concurrent Agent Demo**
+   ```bash
+   aios-concurrent-demo
+   ```
+
+   Code file is located at `example/aios_demo_concurrent.py`
 
 ### Supported LLM Cores
 

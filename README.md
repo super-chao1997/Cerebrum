@@ -19,6 +19,8 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 
 ## Installation
 
+### Standard Installation
+
 1. **Install the package**
    ```bash
    pip install aios-agent-sdk
@@ -26,7 +28,47 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 
 4. **Verify installation**
    ```bash
-   python -c "import cerebrum; print(cerebrum.__version__)"
+   python -c "import cerebrum; from cerebrum.client import Cerebrum; print(Cerebrum)"
+   ```
+
+### Install From Source
+1. **Clone Repo**
+   ```bash
+   git clone https://github.com/agiresearch/Cerebrum.git
+
+   cd Cerebrum
+   ```
+
+3. **Create Virtual Environment**
+   ```bash
+   conda create -n cerebrum-env python=3.10
+   ```
+   or
+   ```bash
+   conda create -n cerebrum-env python=3.11
+   ```
+   or
+   ```bash
+   # Windows
+   python -m venv cerebrum-env
+
+   # Linux/MacOS
+   python3 -m venv cerebrum-env
+   ```
+
+4. **Activate the environment**
+   ```bash
+   conda activate myenv
+   ```
+
+5. **Install the package**
+   ```bash
+   pip install -e .
+   ```
+
+6. **Verify installation**
+   ```bash
+   python -c "import cerebrum; from cerebrum.client import Cerebrum; print(Cerebrum)"
    ```
 
 ## ✈️ Quickstart
@@ -133,70 +175,6 @@ If you would like to join the community, ask questions, chat with fellows, learn
 ## 📪 Contact
 
 For issues related to Cerebrum development, we encourage submitting [issues](https://github.com/agiresearch/Cerebrum/issues), [pull requests](https://github.com/agiresearch/Cerebrum/pulls), or initiating discussions in AIOS [Discord Channel](https://discord.gg/B2HFxEgTJX). For other issues please feel free to contact the AIOS Foundation ([contact@aios.foundation](mailto:contact@aios.foundation)).
-
-
-# Package Installation Guide
-
-This guide provides step-by-step instructions for installing the package using virtual environments. Choose either conda or venv based on your preference and existing setup.
-
-## Table of Contents
-- [Using Conda (Recommended)](#using-conda-recommended)
-- [Using venv (Python's built-in solution)](#using-venv-pythons-built-in-solution)
-- [Troubleshooting](#troubleshooting)
-
-## Using Conda (Recommended)
-
-Conda is a powerful package manager that handles both Python and non-Python dependencies. Here's how to set up your environment:
-
-1. **Install Miniconda/Anaconda** (if not already installed)
-   - Download from: https://docs.conda.io/en/latest/miniconda.html
-   - Follow the installation instructions for your operating system
-
-2. **Create a new conda environment**
-   ```bash
-   conda create -n myenv python=3.9
-   ```
-   Replace `myenv` with your preferred environment name and `3.9` with your desired Python version.
-
-3. **Activate the environment**
-   ```bash
-   conda activate myenv
-   ```
-
-4. **Install the package**
-   ```bash
-   pip install your-package-name
-   ```
-
-5. **Verify installation**
-   ```bash
-   python -c "import your_package_name; print(your_package_name.__version__)"
-   ```
-
-## Using venv (Python's built-in solution)
-
-venv is Python's built-in virtual environment solution. Here's how to use it:
-
-1. **Create a new virtual environment**
-   ```bash
-   # Windows
-   python -m venv myenv
-
-   # Linux/MacOS
-   python3 -m venv myenv
-   ```
-   Replace `myenv` with your preferred environment name.
-
-2. **Activate the environment**
-   ```bash
-   # Windows
-   myenv\Scripts\activate
-
-   # Linux/MacOS
-   source myenv/bin/activate
-   ```
-
-
 
 
 

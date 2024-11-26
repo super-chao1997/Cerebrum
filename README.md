@@ -49,7 +49,7 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
    ```
    or
    ```bash
-   # Windows
+   # Windows (cmd)
    python -m venv cerebrum-env
 
    # Linux/MacOS
@@ -60,13 +60,26 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
    ```bash
    conda activate myenv
    ```
+   or
+   ```bash
+   # Windows (cmd)
+   cd cerebrum-env
+   cd Scripts
+   activate.bat
+   cd ..
+   cd ..
+   
 
-5. **Install the package**
+   # Linux/MacOS
+   source cerebrum-env/bin/activate
+   ```
+
+6. **Install the package**
    ```bash
    pip install -e .
    ```
 
-6. **Verify installation**
+7. **Verify installation**
    ```bash
    python -c "import cerebrum; from cerebrum.client import Cerebrum; print(Cerebrum)"
    ```

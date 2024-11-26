@@ -19,11 +19,7 @@ AIOS provides the AIOS kernel as an abstraction on top of the OS kernel. The ker
 ## 📰 News
 - **[2024-11-026]** 🔥 Cerebrum is available for public release on PyPi!
 
-
-## ✈️ Getting Started
-Please see our ongoing [documentation](https://aios-3.gitbook.io/) for more information.
-
-### Installation
+## Installation
 
 1. **Install the package**
    ```bash
@@ -35,9 +31,13 @@ Please see our ongoing [documentation](https://aios-3.gitbook.io/) for more info
    python -c "import cerebrum; print(cerebrum.__version__)"
    ```
 
-### Quickstart
+## ✈️ Quickstart
+> [!TIP] 
+>
+> Please see our ongoing [documentation](https://aios-3.gitbook.io/) for more information.
 
-
+1. **Start the AIOS Kernel** 
+   📝 See [here](https://aios-3.gitbook.io/aios-docs/getting-started/installation).
 
 ### Supported LLM Cores
 

@@ -7,7 +7,7 @@ dynamic = ["dependencies"]
 description = "Cerebrum: Agent SDK for AIOS"
 keywords = ["llm", "agi", "cerebrum", "os", "aios"]
 license = {file = "LICENSE"}
-name = "inteopeiseu"
+name = "aios-agent-sdk"
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
 version = "0.0.2"
@@ -23,12 +23,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/agiresearch/OpenAGI"
-Repository = "https://github.com/agiresearch/OpenAGI.git"
-"Tools Docs" = "https://github.com/agiresearch/OpenAGI/tools.md"
+Homepage = "https://github.com/agiresearch/Cerebrum"
+Repository = "https://github.com/agiresearch/Cerebrum.git"
 
 [tool.hatch.build]
-include = ["cerebrum"]
+include = ["cerebrum", "example"]
 exclude = [
     "*.egg-info/",
     "dist",
@@ -40,6 +39,9 @@ exclude = [
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
+
+[project.scripts]
+aios-basic-demo = "cerebrum.example.aios_demo:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

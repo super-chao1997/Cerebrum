@@ -8,11 +8,10 @@ The goal of AIOS is to build a Large Language Model (LLM) agent operating system
 
 ## 🏠 Cerebrum Architecture
 <p align="center">
-<img src="docs/assets/cerebrum.png">
+<img src="docs/assets/details.png">
 </p>
 
-The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the AIOS kernel.
-AIOS kernel is the current repository and AIOS-Agent SDK can be found at [here](https://github.com/agiresearch/Cerebrum). 
+The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the [AIOS kernel](https://github.com/agiresearch/Cerebrum.git). 
 
 ## 📰 News
 - **[2024-11-26]** 🔥 Cerebrum is available for public release on PyPI!

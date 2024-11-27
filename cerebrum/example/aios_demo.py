@@ -109,7 +109,7 @@ def main():
     parser.add_argument(
         "task",
         nargs="?",
-        default="Tell me what is the prollm paper mainly about?",
+        default="Help me search the AIOS paper and introduce its core idea. ",
         help="Task for the agent to execute"
     )
 

@@ -173,8 +173,8 @@ def main():
 
     # Example tasks
     tasks = [
-        ["example/academic_agent", {"task": "Tell me what is the aios paper mainly about?"}],
-        ["example/academic_agent", {"task": "Tell me what is the prollm paper mainly about?"}]
+        ["example/academic_agent", {"task": "Help me search the AIOS paper and introduce its core idea."}],
+        ["example/academic_agent", {"task": "Propose new research questions based on the AIOS paper."}]
     ]
 
     try:

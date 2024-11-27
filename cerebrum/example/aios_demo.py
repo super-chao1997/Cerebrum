@@ -103,7 +103,7 @@ def main():
     )
     parser.add_argument(
         "--agent",
-        default="/Users/rama2r/Cerebrum/example/agents/academic_agent",
+        default="academic_agent",
         help="Path to the agent to execute"
     )
     parser.add_argument(

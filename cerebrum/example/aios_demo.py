@@ -12,17 +12,18 @@ from typing import Optional, Dict, Any
 
 
 def setup_client(
-    llm_name: str = "gemini-1.5-flash",
+    llm_name: str,
+    llm_backend: str,
     root_dir: str = "root",
     memory_limit: int = 500*1024*1024,
-    max_workers: int = 32
+    max_workers: int = 32,
 ) -> Cerebrum:
     """Initialize and configure the Cerebrum client with specified parameters."""
     client = Cerebrum()
     config.global_client = client
 
     try:
-        client.add_llm_layer(LLMLayer(llm_name=llm_name)) \
+        client.add_llm_layer(LLMLayer(llm_name=llm_name, llm_backend=llm_backend)) \
               .add_storage_layer(StorageLayer(root_dir=root_dir)) \
               .add_memory_layer(MemoryLayer(memory_limit=memory_limit)) \
               .add_tool_layer(ToolLayer()) \
@@ -74,9 +75,15 @@ def main():
     """Main entry point for the demo script."""
     parser = argparse.ArgumentParser(description="AIOS Agent Demo")
     parser.add_argument(
-        "--llm", 
-        default="gemini-1.5-flash",
-        help="LLM model to use"
+        "--llm_name", 
+        help="LLM model to use",
+        required=True
+    )
+    parser.add_argument(
+        "--llm_backend",
+        help="Backend service to use",
+        required=True,
+        choices=["openai", "google", "anthropic", "huggingface", "ollama", "vllm"]
     )
     parser.add_argument(
         "--root-dir",
@@ -116,7 +123,7 @@ def main():
     args = parser.parse_args()
 
     print("🔧 Starting AIOS Demo with configuration:")
-    print(f"  LLM: {args.llm}")
+    print(f"  LLM: {args.llm_name} ({args.llm_backend})")
     print(f"  Root Directory: {args.root_dir}")
     print(f"  Memory Limit: {args.memory_limit} bytes")
     print(f"  Max Workers: {args.max_workers}")
@@ -127,7 +134,8 @@ def main():
 
     try:
         client = setup_client(
-            llm_name=args.llm,
+            llm_name=args.llm_name,
+            llm_backend=args.llm_backend,
             root_dir=args.root_dir,
             memory_limit=args.memory_limit,
             max_workers=args.max_workers

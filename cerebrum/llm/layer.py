@@ -7,4 +7,4 @@ class LLMLayer:
     eval_device: str = "cuda:0"
     max_new_tokens: int = 2048
     log_mode: str = "console"
-    use_backend: str = "default"
+    llm_backend: str = "default"

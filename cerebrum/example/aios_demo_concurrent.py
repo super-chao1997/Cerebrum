@@ -14,11 +14,11 @@ from pathlib import Path
 
 
 def setup_client(
-    llm_name: str = "gpt-4o-mini",
+    llm_name: str,
+    llm_backend: str,
     root_dir: str = "root",
     memory_limit: int = 500*1024*1024,
     max_workers: int = 32,
-    use_backend: str = "openai"
 ) -> Cerebrum:
     """Initialize and configure the Cerebrum client with specified parameters.
     
@@ -36,7 +36,7 @@ def setup_client(
     config.global_client = client
 
     try:
-        client.add_llm_layer(LLMLayer(llm_name=llm_name, use_backend=use_backend)) \
+        client.add_llm_layer(LLMLayer(llm_name=llm_name, llm_backend=llm_backend)) \
               .add_storage_layer(StorageLayer(root_dir=root_dir)) \
               .add_memory_layer(MemoryLayer(memory_limit=memory_limit)) \
               .add_tool_layer(ToolLayer()) \
@@ -121,14 +121,15 @@ def main():
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(description="Cerebrum Task Runner")
     parser.add_argument(
-        "--llm", 
-        default="gpt-4o-mini",
-        help="LLM model to use"
+        "--llm_name", 
+        help="LLM model to use",
+        required=True
     )
     parser.add_argument(
-        "--backend",
-        default="openai",
-        help="Backend service to use"
+        "--llm_backend",
+        help="Backend service to use",
+        required=True,
+        choices=["openai", "google", "anthropic", "huggingface", "ollama", "vllm"]
     )
     parser.add_argument(
         "--root-dir",
@@ -162,8 +163,7 @@ def main():
     args = parser.parse_args()
 
     print("🔧 Starting Cerebrum Task Runner with configuration:")
-    print(f"  LLM: {args.llm}")
-    print(f"  Backend: {args.backend}")
+    print(f"  LLM: {args.llm_name} ({args.llm_backend})")
     print(f"  Root Directory: {args.root_dir}")
     print(f"  Memory Limit: {args.memory_limit} bytes")
     print(f"  Max Workers: {args.max_workers}")
@@ -180,11 +180,11 @@ def main():
     try:
         # Initialize client
         client = setup_client(
-            llm_name=args.llm,
+            llm_name=args.llm_name,
             root_dir=args.root_dir,
             memory_limit=args.memory_limit,
             max_workers=args.max_workers,
-            use_backend=args.backend
+            llm_backend=args.llm_backend
         )
 
         # Run tasks

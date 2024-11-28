@@ -11,7 +11,7 @@ The goal of AIOS is to build a Large Language Model (LLM) agent operating system
 <img src="docs/assets/details.png">
 </p>
 
-The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the [AIOS kernel](https://github.com/agiresearch/Cerebrum.git). 
+The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the [AIOS kernel](https://github.com/agiresearch/AIOS.git). 
 
 ## 📰 News
 - **[2024-11-26]** 🔥 Cerebrum is available for public release on PyPI!
@@ -93,17 +93,17 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
 2. **Run the AIOS Basic Demo**
    ```bash
-   aios-basic-demo
+   aios-basic-demo --llm_name gpt-4o-mini --llm_backend openai
    ```
 
-   Code file is located at `example/aios_demo.py`
+   Code file is located at `cerebrum/example/aios_demo.py`
 
 3. **Run the AIOS Concurrent Agent Demo**
    ```bash
-   aios-concurrent-demo
+   aios-concurrent-demo --llm_name gpt-4o-mini --llm_backend openai
    ```
 
-   Code file is located at `example/aios_demo_concurrent.py`
+   Code file is located at `cerebrum/example/aios_demo_concurrent.py`
 
 ### Supported LLM Cores
 
@@ -145,10 +145,10 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
 [^bignote2]: **vLLM Model String Format:**
      - Format: `model-name`. Some examples are `mistral-7b-instruct`, `llama2-70b`, or `mixtral-8x7b`.
-     - VLLM is a high-performance inference engine that can serve any HuggingFace model
+     - vLLM is a high-performance inference engine that can serve any HuggingFace model
      - You can specify custom model paths: `vllm/path/to/your/model`
      - Supports quantization parameters: `vllm/mistral-7b-instruct-4bit`
-     - See AIOS documentation for setting up VLLM
+     - See AIOS documentation for setting up vLLM
 
 [^bignote3]: **HuggingFace Model String Format:**
      - Format: `owner/model-name`. Some examples are `mistralai/Mistral-7B-v0.1`, `meta-llama/Llama-2-70b-hf`, or `TheBloke/Llama-2-13B-GPTQ`.

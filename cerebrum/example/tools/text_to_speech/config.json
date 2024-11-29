@@ -1,15 +1,15 @@
 {
-    "name": "arxiv",
+    "name": "TextToSpeech",
     "description": [
-        "The arxiv tool that can be used to search for papers on arxiv"
+        "Convert text to speech. "
     ],
     "meta": {
         "author": "example",
-        "version": "1.0.6",
+        "version": "0.0.1",
         "license": "CC0"
     },
     "build": {
         "entry": "tool.py",
-        "module": "Arxiv"
+        "module": "TextToSpeech"
     }
 }

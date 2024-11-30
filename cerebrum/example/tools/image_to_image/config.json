@@ -4,7 +4,7 @@
         "The image to image tool that can be used to convert images to other images"
     ],
     "meta": {
-        "author": "example",
+        "author": "timbrooks",
         "version": "0.0.1",
         "license": "CC0"
     },

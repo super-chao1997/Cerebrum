@@ -2,7 +2,7 @@ from cerebrum.agents.base import BaseAgent
 from cerebrum.llm.communication import LLMQuery
 import json
 
-class AcademicAgent(BaseAgent):
+class CocktailMixlogist(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
 
@@ -82,15 +82,20 @@ class AcademicAgent(BaseAgent):
     def manual_workflow(self):
         workflow = [
             {
-                "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["example/arxiv"],
+                "action_type": "chat",
+                "action": "Gather user preferences (alcoholic or non-alcoholic, taste profile, occasion)",
+                "tool_use": []
             },
             {
                 "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
+                "action": "Identify available ingredients and potential substitutions",
+                "tool_use": []
             },
+            {
+                "action_type": "chat",
+                "action": "Create cocktail or mocktail recipes",
+                "tool_use": []
+            }
         ]
         return workflow
 

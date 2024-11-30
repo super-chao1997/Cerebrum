@@ -9,7 +9,7 @@
         "license": "CC0"
     },
     "build": {
-        "entry": "wikipedia.py",
+        "entry": "tool.py",
         "module": "Wikipedia"
     }
 }

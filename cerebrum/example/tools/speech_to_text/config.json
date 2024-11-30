@@ -4,7 +4,7 @@
         "The speech to text tool that can be used to convert speech to text"
     ],
     "meta": {
-        "author": "example",
+        "author": "openai",
         "version": "0.0.1",
         "license": "CC0"
     },

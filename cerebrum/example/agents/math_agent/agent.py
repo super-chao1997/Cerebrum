@@ -2,7 +2,7 @@ from cerebrum.agents.base import BaseAgent
 from cerebrum.llm.communication import LLMQuery
 import json
 
-class AcademicAgent(BaseAgent):
+class MathAgent(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
 
@@ -17,7 +17,6 @@ class AcademicAgent(BaseAgent):
         self.messages = []
         self.workflow_mode = "manual"  # (manual, automatic)
         self.rounds = 0
-
 
     def build_system_instruction(self):
         prefix = "".join(["".join(self.config["description"])])
@@ -83,14 +82,19 @@ class AcademicAgent(BaseAgent):
         workflow = [
             {
                 "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["example/arxiv"],
+                "action": "Identify the problem type and relevant formulas",
+                "tool_use": ["wikipedia"]
             },
             {
                 "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
+                "action": "Break down the problem into steps",
+                "tool_use": []
             },
+            {
+                "action_type": "chat",
+                "action": "Provide final answer/solution",
+                "tool_use": []
+            }
         ]
         return workflow
 
@@ -169,3 +173,4 @@ class AcademicAgent(BaseAgent):
         except Exception as e:
 
             return {}
+

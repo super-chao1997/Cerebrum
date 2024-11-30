@@ -2,7 +2,7 @@ from cerebrum.agents.base import BaseAgent
 from cerebrum.llm.communication import LLMQuery
 import json
 
-class AcademicAgent(BaseAgent):
+class MemeCreator(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
 
@@ -82,15 +82,20 @@ class AcademicAgent(BaseAgent):
     def manual_workflow(self):
         workflow = [
             {
+                "action_type": "chat",
+                "action": "Gather user input (topic, text, image)",
+                "tool_use": []
+            },
+            {
                 "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["example/arxiv"],
+                "action": "Select a suitable meme template or create a custom image",
+                "tool_use": ["text_to_image"]
             },
             {
                 "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
-            },
+                "action": "Add text to the image based on user input",
+                "tool_use": []
+            }
         ]
         return workflow
 
@@ -169,3 +174,4 @@ class AcademicAgent(BaseAgent):
         except Exception as e:
 
             return {}
+

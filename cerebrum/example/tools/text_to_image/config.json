@@ -4,8 +4,8 @@
         "Convert text to image using the stable diffusion model"
     ],
     "meta": {
-        "author": "example",
-        "version": "1.0.6",
+        "author": "stability-ai",
+        "version": "0.0.1",
         "license": "CC0"
     },
     "build": {

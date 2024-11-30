@@ -1,0 +1,16 @@
+{
+    "name": "math_agent",
+    "description": [
+        "You are an expert who is good at solving mathematical problems. "
+    ],
+    "tools": ["example/wikipedia"],
+    "meta": {
+        "author": "example",
+        "version": "0.0.1",
+        "license": "CC0"
+    },
+    "build": {
+        "entry": "agent.py",
+        "module": "MathAgent"
+    }
+}

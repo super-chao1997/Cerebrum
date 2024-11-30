@@ -21,16 +21,16 @@ class Wikipedia(BaseTool):
 
     def build_client(self):
         try:
-            import wikipedia
+            import cerebrum.example.tools.wikipedia.tool as tool
 
-            wikipedia.set_lang(self.lang)
+            tool.set_lang(self.lang)
 
         except ImportError:
             raise ImportError(
                 "Could not import wikipedia python package. "
                 "Please install it with `pip install wikipedia`."
             )
-        return wikipedia
+        return tool
 
     def run(self, params) -> str:
         """Run Wikipedia search and get page summaries."""
@@ -57,13 +57,13 @@ class Wikipedia(BaseTool):
 			"type": "function",
 			"function": {
 				"name": "wikipedia",
-				"description": "Provides relevant information about the destination",
+				"description": "Search information on the Wikipedia",
 				"parameters": {
 					"type": "object",
 					"properties": {
 						"query": {
 							"type": "string",
-							"description": "Search query for Wikipedia"
+							"description": "Query used for searching information on the Wikipedia"
 						}
 					},
 					"required": [

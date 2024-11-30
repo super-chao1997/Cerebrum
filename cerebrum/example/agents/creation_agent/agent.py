@@ -2,7 +2,7 @@ from cerebrum.agents.base import BaseAgent
 from cerebrum.llm.communication import LLMQuery
 import json
 
-class AcademicAgent(BaseAgent):
+class CreationAgent(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
 
@@ -82,15 +82,20 @@ class AcademicAgent(BaseAgent):
     def manual_workflow(self):
         workflow = [
             {
-                "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["example/arxiv"],
+                "action_type": "chat",
+                "action": "Gather content requirements (platform, topic, style) and generate engaging text content",
+                "tool_use": []
             },
             {
                 "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
+                "action": "Create visually appealing images",
+                "tool_use": ["text_to_image"]
             },
+            {
+                "action_type": "chat",
+                "action": "Summarize content and post",
+                "tool_use": []
+            }
         ]
         return workflow
 
@@ -169,3 +174,5 @@ class AcademicAgent(BaseAgent):
         except Exception as e:
 
             return {}
+
+

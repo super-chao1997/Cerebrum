@@ -2,7 +2,7 @@ from cerebrum.agents.base import BaseAgent
 from cerebrum.llm.communication import LLMQuery
 import json
 
-class AcademicAgent(BaseAgent):
+class StoryTeller(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
 
@@ -82,15 +82,20 @@ class AcademicAgent(BaseAgent):
     def manual_workflow(self):
         workflow = [
             {
+                "action_type": "chat",
+                "action": "Determine the story genre and theme based on user input and generate initial story plot and characters.",
+                "tool_use": []
+            },
+            {
                 "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["example/arxiv"],
+                "action": "Create visual representations for the main character.",
+                "tool_use": ["text_to_image"]
             },
             {
                 "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
-            },
+                "action": "Incorporate it into the story narrative and summarize the story",
+                "tool_use": []
+            }
         ]
         return workflow
 

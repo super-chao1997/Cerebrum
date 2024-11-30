@@ -219,10 +219,10 @@ AIOS provides several `Query` classes for different types of interactions and us
 
 | Query Class | Arguments | Output |
 |:--|:--|:--|
-| LLMQuery | messages: List, tools: List, action_type: str, message_return_type: str | response: Response |
-| MemoryQuery | TBD | response: Response |
-| StorageQuery | TBD | response: Response |
-| ToolQuery | tool_calls: List | response: Response |
+| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str` = choice("chat", "tool_use", "operate_file"), message_return_type: `str` = choice("text", "json") | response: `Response` |
+| `MemoryQuery` | TBD | response: `Response` |
+| `StorageQuery` | TBD | response: `Response` |
+| `ToolQuery` | tool_calls: `List` | response: `Response` |
 
 Here's how to import queries to use
 ```python

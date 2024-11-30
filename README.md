@@ -176,14 +176,14 @@ Their source code can be found at the [tool folder](./cerebrum/example/tools/).
 | stability-ai| text_to_image          | stability-ai/text_to_image         |
 | example     | text_to_speech         | example/text_to_speech             |
 
-If you would like to develop your new tools, you can refer to more 
+If you would like to develop your new tools, you can refer to the too 
 
 #### Develop your agent logic
 Here provides a minimal example of how to build your agents.
 
 ##### Inherit the BaseAgent and override the methods
 First, you need to construct an agent class which is exactly the same name you set up for the module in the JSON file. To connect to the AIOS, you need to inherit the BaseAgent class and override the __init__ and run method.
-```
+```python
 from cerebrum.agents.base import BaseAgent
 import json
 
@@ -367,14 +367,17 @@ def run(self):
                 "agent_name": self.agent_name,
                 "result": "Failed to generate a valid workflow in the given times.",
                 "rounds": self.rounds,
-
             }
             
     except Exception as e:
 
         return {}
 ```
-
+#### Run your new developed agents
+To run your new developed agents, you can pass the absolute path for the agent and assign the task using the aios_demo.py script by setting up the llm_name and the llm_backend. 
+```
+python aios_demo.py --llm_name <llm_name> --llm_backend <llm_backend> --
+```
 
 
 ## Supported LLM Cores

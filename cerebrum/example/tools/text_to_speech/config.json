@@ -1,5 +1,5 @@
 {
-    "name": "TextToSpeech",
+    "name": "text_to_speech",
     "description": [
         "Convert text to speech. "
     ],

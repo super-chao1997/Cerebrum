@@ -97,12 +97,20 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    ```bash
    aios-basic-demo --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
    ```
-
+   which is the same as using 
+   ```bash
+   python cerebrum/example/aios_demo.py --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
+   ```
    Code file is located at `cerebrum/example/aios_demo.py`
 
    Run the client with agents concurrently
+   
    ```bash
    aios-concurrent-demo --llm_name gpt-4o-mini --llm_backend openai
+   ```
+   which is the same as using 
+   ```bash
+   python cerebrum/example/aios_demo_concurrent.py --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
    ```
 
    Code file is located at `cerebrum/example/aios_demo_concurrent.py`
@@ -176,7 +184,7 @@ Their source code can be found at the [tool folder](./cerebrum/example/tools/).
 | stability-ai| text_to_image          | stability-ai/text_to_image         |
 | example     | text_to_speech         | example/text_to_speech             |
 
-If you would like to develop your new tools, you can refer to the too 
+If you would like to develop your new tools, you can refer to the [tool folder](./cerebrum/example/tools/).  
 
 #### Develop your agent logic
 Here provides a minimal example of how to build your agents.
@@ -376,7 +384,7 @@ def run(self):
 #### Run your new developed agents
 To run your new developed agents, you can pass the absolute path for the agent and assign the task using the aios_demo.py script by setting up the llm_name and the llm_backend. 
 ```
-python aios_demo.py --llm_name <llm_name> --llm_backend <llm_backend> --
+python aios_demo.py --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
 ```
 
 

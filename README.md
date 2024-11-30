@@ -93,7 +93,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
 2. **Run the AIOS Basic Demo**
    ```bash
-   aios-basic-demo --llm_name gpt-4o-mini --llm_backend openai
+   aios-basic-demo --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
    ```
 
    Code file is located at `cerebrum/example/aios_demo.py`
@@ -104,6 +104,8 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    ```
 
    Code file is located at `cerebrum/example/aios_demo_concurrent.py`
+
+# 🚀 How to develop and publish your agents
 
 ### Supported LLM Cores
 
@@ -134,28 +136,9 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 | Groq | Gemma 2B | ✅ | gemma2-9b-it |groq|
 | Groq | Llama3 Groq 70B | ✅ | llama3-groq-70b-8192-tool-use-preview |groq|
 | Groq | Llama3 Groq 8B | ✅ | llama3-groq-8b-8192-tool-use-preview |groq|
-| ollama[^bignote1] | All Models | ✅ | model-name |ollama|
-| vLLM[^bignote2] | All Models | ✅ | model-name |vllm|
-| HuggingFace[^bignote3] | All Models | ✅ | model-name |huggingface|
-
-[^bignote1]: **ollama Model String Format:**
-      - Format: `model-name`. Some examples are `llama2`, `mistral`, or `codellama`.
-      - Ollama allows you to run models locally using their CLI tool and API
-      - See AIOS documentation for setting up ollama
-
-[^bignote2]: **vLLM Model String Format:**
-     - Format: `model-name`. Some examples are `mistral-7b-instruct`, `llama2-70b`, or `mixtral-8x7b`.
-     - vLLM is a high-performance inference engine that can serve any HuggingFace model
-     - You can specify custom model paths: `vllm/path/to/your/model`
-     - Supports quantization parameters: `vllm/mistral-7b-instruct-4bit`
-     - See AIOS documentation for setting up vLLM
-
-[^bignote3]: **HuggingFace Model String Format:**
-     - Format: `owner/model-name`. Some examples are `mistralai/Mistral-7B-v0.1`, `meta-llama/Llama-2-70b-hf`, or `TheBloke/Llama-2-13B-GPTQ`.
-     - Can include specific versions: `owner/model-name@v1.0`
-     - Supports multiple model formats (PyTorch, Safetensors, GGUF, GPTQ)
-     - Can reference private models with auth token: `huggingface/username/private-model`
-     - See AIOS documentation for setting up HuggingFace (if necessary)
+| ollama | [All Models](https://ollama.com/search) | ✅ | model-name |ollama|
+| vLLM | [All Models](https://docs.vllm.ai/en/latest/) | ✅ | model-name |vllm|
+| HuggingFace | [All Models](https://huggingface.co/models/) | ✅ | model-name |huggingface|
 
 
 ## 🖋️ References

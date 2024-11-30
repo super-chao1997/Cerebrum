@@ -1,6 +1,6 @@
 # Cerebrum: Agent SDK for AIOS
 
-<a href='https://aios-3.gitbook.io/'><img src='https://img.shields.io/badge/Documentation-Cerebrum-blue'></a>
+<a href='https://docs.aios.foundation/'><img src='https://img.shields.io/badge/Documentation-Cerebrum-blue'></a>
 [![Code License](https://img.shields.io/badge/Code%20License-MIT-orange.svg)](https://github.com/agiresearch/AIOS/blob/main/LICENSE)
 <a href='https://discord.gg/B2HFxEgTJX'><img src='https://img.shields.io/badge/Community-Discord-8A2BE2'></a>
 
@@ -86,10 +86,10 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 ## ✈️ Quickstart
 > [!TIP] 
 >
-> Please see our [documentation](https://aios-3.gitbook.io/) for more information.
+> Please see our [documentation](https://docs.aios.foundation/) for more information.
 
 1. **Start the AIOS Kernel** 
-   📝 See [here](https://aios-3.gitbook.io/aios-docs/getting-started/installation).
+   📝 See [here](https://docs.aios.foundation/getting-started/installation).
 
 2. **Run the AIOS Client**
 
@@ -115,37 +115,41 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
    Code file is located at `cerebrum/example/aios_demo_concurrent.py`
 
-## 🚀 How to develop and publish your agents
-### Agent Format
-Before you develop your own agents and would like to run that on AIOS, you need to make sure that structure of agent is strictly organized as below. 
-#### Folder format and mandatory files
-You need to put the agent folder as the following structure
+
+# 🚀 Developing and Publishing Your Agents
+
+This guide will walk you through creating and publishing your own agents for AIOS. 
+### Agent Structure
+
+First, let's look at how to organize your agent's files. Every agent needs three essential components:
+
 ```
 author/
 └── agent_name/
-      │── entry.py # the entry file to run your new agents
-      │── config.json # agent information, e.g., name, usage, license, etc.
-      └── meta_requirements.txt # specific dependencies used for running your agent
+      │── entry.py        # Your agent's main logic
+      │── config.json     # Configuration and metadata
+      └── meta_requirements.txt  # Additional dependencies
 ```
-For example, your author name is ‘example’, and you have developed an agent called demo_agent used for searching and summarizing articles. Your local folder will be like the following:
+
+For example, if your name is 'example' and you're building a demo_agent that searches and summarizes articles, your folder structure would look like this:
+
 ```
 example/
-   └── dem_agent/
+   └── demo_agent/
          │── entry.py
          │── config.json
          └── meta_requirements.txt
 ```
 
-If your agent requires extra libraries (in addition to the AIOS-dependent libraries) to run, you must put them in the meta_requirements.txt.
+Note: If your agent needs any libraries beyond AIOS's built-in ones, make sure to list them in meta_requirements.txt. Apart from the above three files, you can have any other files in your folder. 
 
-These three files **(config.json, entry.py, meta_requirements.txt)** are the minimal requirements to be had in the agent implementations. 
+### Configuring Your Agent
 
-After you have setup the agent folder, you can then follow the instructions below to develop your agents. 
+#### Setting Up Metadata
 
-### Setup configurations for your agents
-#### Setup metadata
-You are required to include a JSON file with all the metadata used for the agent you would like to develop including the following attributes:
-```
+Your agent needs a config.json file that describes its functionality. Here's what it should include:
+
+```json
 {
    "name": "name of the agent",
    "description": [
@@ -165,32 +169,40 @@ You are required to include a JSON file with all the metadata used for the agent
    }
 }
 ```
-#### Setup tools
-The table below shows current available tools and provides how to set them in the configuration. 
-Their source code can be found at the [tool folder](./cerebrum/example/tools/). 
 
-| Author       | Name                    | How to set them in the configuration                          |
-|-------------|-------------------------|-------------------------------------|
-| example     | arxiv                   | example/arxiv                       |
-| example     | bing_search            | example/bing_search                 |
-| example     | currency_converter      | example/currency_converter          |
-| example     | wolfram_alpha          | example/wolfram_alpha               |
-| example     | google_search          | example/google_search               |
-| openai      | speech_to_text         | openai/speech_to_text              |
-| example     | web_browser            | example/web_browser                 |
-| timbrooks   | image_to_image         | timbrooks/image_to_image           |
-| example     | downloader             | example/downloader                  |
-| example     | doc_question_answering | example/doc_question_answering      |
-| stability-ai| text_to_image          | stability-ai/text_to_image         |
-| example     | text_to_speech         | example/text_to_speech             |
+### Available Tools
 
-If you would like to develop your new tools, you can refer to the [tool folder](./cerebrum/example/tools/).  
+When setting up your agent, you'll need to specify which tools it will use. Below is a list of all currently available tools and how to reference them in your configuration:
 
-#### Develop your agent logic
-Here provides a minimal example of how to build your agents.
+| Author | Name | How to Use |
+|:--|:--|:--|
+| example | arxiv | example/arxiv |
+| example | bing_search | example/bing_search |
+| example | currency_converter | example/currency_converter |
+| example | wolfram_alpha | example/wolfram_alpha |
+| example | google_search | example/google_search |
+| openai | speech_to_text | openai/speech_to_text |
+| example | web_browser | example/web_browser |
+| timbrooks | image_to_image | timbrooks/image_to_image |
+| example | downloader | example/downloader |
+| example | doc_question_answering | example/doc_question_answering |
+| stability-ai | text_to_image | stability-ai/text_to_image |
+| example | text_to_speech | example/text_to_speech |
 
-##### Inherit the BaseAgent and override the methods
-First, you need to construct an agent class which is exactly the same name you set up for the module in the JSON file. To connect to the AIOS, you need to inherit the BaseAgent class and override the __init__ and run method.
+To use these tools in your agent, simply include their reference (from the "How to Use" column) in your agent's configuration file. For example, if you want your agent to be able to search academic papers and convert currencies, you would include both `example/arxiv` and `example/currency_converter` in your configuration.
+
+Want to create your own tools? You can either:
+1. Integrate them directly into your agent for now, or
+2. Check out the implementation examples in the [tool folder](./cerebrum/example/tools/) to learn how to develop standalone tools.
+
+### Building Your Agent's Logic
+
+Let's walk through creating your agent's core functionality.
+
+#### 1. Setting Up the Base Class
+
+First, create your agent class by inheriting from BaseAgent:
+
 ```python
 from cerebrum.agents.base import BaseAgent
 import json
@@ -201,192 +213,147 @@ class DemoAgent(BaseAgent):
         pass
 ```
 
-##### Import the Query functions
-For now, we provide four different query classes to interact with different modules in the AIOS and use the Response format to receive results by sending queries. 
+#### 2. Using Query Functions
+
+AIOS provides several `Query` classes for different types of interactions and use the `Response` class in [here](./cerebrum/llm/communication.py) to receive results from the AIOS kernel. 
+
+| Query Class | Arguments | Output |
+|:--|:--|:--|
+| LLMQuery | messages: List, tools: List, action_type: str, message_return_type: str | response: Response |
+| MemoryQuery | TBD | response: Response |
+| StorageQuery | TBD | response: Response |
+| ToolQuery | tool_calls: List | response: Response |
+
+Here's how to import queries to use
 ```python
-from cerebrum.llm.communication import LLMQuery # use LLMQuery as an example
+from cerebrum.llm.communication import LLMQuery  # Using LLMQuery as an example
 ```
-Below shows how to use different queries (MemoryQuery and StorageQuery are under development). 
-| class       | Arguments                    | Output|
-|-------------|-------------------------|-------------------------------------|
-| LLMQuery     | messages: List, tools: List, action_type: str, message_return_type: str | response: Response |
-| MemoryQuery     | TBD            | response: Response
-| StorageQuery     | TBD      | response: Response          |
-| ToolQuery     | tool_calls: List          | response: Response |
 
+#### 3. Creating System Instructions
 
-##### Construct system prompts
-Then you need construct your own system prompts for your agent, below shows a simple example. 
+Here's how to set up your agent's system instructions:
+
 ```python
 def build_system_instruction(self):
     prefix = "".join(["".join(self.config["description"])])
 
-    plan_instruction = "".join(
-        [
-            f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
-            "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
-            "The plan must follow the json format as below: ",
-            "[",
-            '{"action_type": "action_type_value", "action": "action_value","tool_use": [tool_name1, tool_name2,...]}',
-            '{"action_type": "action_type_value", "action": "action_value", "tool_use": [tool_name1, tool_name2,...]}',
-            "...",
-            "]",
-            "In each step of the planned plan, identify tools to use and recognize no tool is necessary. ",
-            "Followings are some plan examples. ",
-            "[" "[",
-            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
-            '{"action_type": "chat", "action": "write a summarization based on the gathered information. ", "tool_use": []}',
-            "];",
-            "[",
-            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
-            '{"action_type": "chat", "action": "understand the current methods and propose ideas that can improve ", "tool_use": []}',
-            "]",
-            "]",
-        ]
-    )
+    plan_instruction = "".join([
+        f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
+        "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
+        "The plan must follow this JSON format: ",
+        "[",
+        '{"action_type": "action_type_value", "action": "action_value", "tool_use": [tool_name1, tool_name2,...]}',
+        "]",
+    ])
 
     if self.workflow_mode == "manual":
         self.messages.append({"role": "system", "content": prefix})
-
     else:
-        assert self.workflow_mode == "automatic"
         self.messages.append({"role": "system", "content": prefix})
         self.messages.append({"role": "user", "content": plan_instruction})
 ```
 
-##### Build workflow for agents and run
-You can either build workflow by manual definition 
+#### 4. Creating Workflows
+
+You can create workflows either manually or automatically:
+
+Manual Workflow Example:
 ```python
 def manual_workflow(self):
     workflow = [
         {
             "action_type": "chat",
-            "action": "Identify user's target language and learning goals and create grammar explanations and practice sentences.",
+            "action": "Identify user's goals and create explanations",
             "tool_use": []
         },
         {
             "action_type": "chat",
-            "action": "Provide audio examples of pronunciation.",
-            "tool_use": []
-        },
-        {
-            "action_type": "chat",
-            "action": "Engage in conversation practice with the user.",
+            "action": "Provide examples",
             "tool_use": []
         }
     ]
     return workflow
 ```
-or generate workflow automatically. 
+
+Automatic Workflow Example:
 ```python
 def automatic_workflow(self):
     for i in range(self.plan_max_fail_times):
         response = self.send_request(
             agent_name=self.agent_name,
             query=LLMQuery(
-                messages=self.messages, tools=None, message_return_type="json"
+                messages=self.messages, 
+                tools=None, 
+                message_return_type="json"
             ),
         )["response"]
 
         workflow = self.check_workflow(response.response_message)
-
-        self.rounds += 1
-
+        
         if workflow:
             return workflow
-
-        else:
-            self.messages.append(
-                {
-                    "role": "assistant",
-                    "content": f"Fail {i+1} times to generate a valid plan. I need to regenerate a plan",
-                }
-            )
+        
+        self.messages.append({
+            "role": "assistant",
+            "content": f"Attempt {i+1} failed to generate a valid plan. Retrying..."
+        })
     return None
 ```
-After defining your workflows, you can build the run method. 
+
+#### 5. Implementing the Run Method
+
+Finally, implement the run method to execute your agent's workflow:
+
 ```python
 def run(self):
     self.build_system_instruction()
-
-    task_input = self.task_input
-
-    self.messages.append({"role": "user", "content": task_input})
-
-    workflow = None
-
-    if self.workflow_mode == "automatic":
-        workflow = self.automatic_workflow()
-        self.messages = self.messages[:1]  # clear long context
-
-    else:
-        assert self.workflow_mode == "manual"
-        workflow = self.manual_workflow()
-
-    self.messages.append(
-        {
-            "role": "user",
-            "content": f"[Thinking]: The workflow generated for the problem is {json.dumps(workflow)}. Follow the workflow to solve the problem step by step. ",
+    
+    # Add task input to messages
+    self.messages.append({"role": "user", "content": self.task_input})
+    
+    # Get workflow
+    workflow = self.automatic_workflow() if self.workflow_mode == "automatic" else self.manual_workflow()
+    
+    if not workflow:
+        return {
+            "agent_name": self.agent_name,
+            "result": "Failed to generate a valid workflow",
+            "rounds": self.rounds
         }
-    )
-
+    
     try:
-        if workflow:
-            final_result = ""
-
-            for i, step in enumerate(workflow):
-                action_type = step["action_type"]
-                action = step["action"]
-                tool_use = step["tool_use"]
-
-                prompt = f"At step {i + 1}, you need to: {action}. "
-                self.messages.append({"role": "user", "content": prompt})
-
-                if tool_use:
-                    selected_tools = self.pre_select_tools(tool_use)
-
-                else:
-                    selected_tools = None
-
-                response = self.send_request(
-                    agent_name=self.agent_name,
-                    query=LLMQuery(
-                        messages=self.messages,
-                        tools=selected_tools,
-                        action_type=action_type,
-                    ),
-                )["response"]
-                
-                self.messages.append({"role": "assistant", "content": response.response_message})
-
-                self.rounds += 1
-
-
-            final_result = self.messages[-1]["content"]
+        final_result = ""
+        for i, step in enumerate(workflow):
+            # Execute each step in the workflow
+            response = self.execute_step(step, i)
+            final_result = response.response_message
             
-            return {
-                "agent_name": self.agent_name,
-                "result": final_result,
-                "rounds": self.rounds,
-            }
-
-        else:
-            return {
-                "agent_name": self.agent_name,
-                "result": "Failed to generate a valid workflow in the given times.",
-                "rounds": self.rounds,
-            }
-            
+        return {
+            "agent_name": self.agent_name,
+            "result": final_result,
+            "rounds": self.rounds
+        }
+        
     except Exception as e:
+        return {
+            "agent_name": self.agent_name,
+            "result": f"Error occurred: {str(e)}",
+            "rounds": self.rounds
+        }
+```
 
-        return {}
-```
-#### Run your new developed agents
-To run your new developed agents, you can pass the absolute path for the agent and assign the task using the aios_demo.py script by setting up the llm_name and the llm_backend. 
-```
+### Running Your Agent
+
+To test your agent, use the aios_demo.py script:
+
+```bash
 python aios_demo.py --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
 ```
-
+Replace the placeholders with your specific values:
+- `<llm_name>`: The name of the language model you want to use
+- `<llm_backend>`: The backend service for the language model
+- `<your_agent_folder_path>`: The path to your agent's folder
+- `<task_input>`: The task you want your agent to perform
 
 ## Supported LLM Cores
 | Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ | Backend ⚙️ |

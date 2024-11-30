@@ -1,7 +1,17 @@
 from cerebrum.manager.agent import AgentManager
 
-manager = AgentManager('https://my.aios.foundation')
+import argparse
 
-agent_package = manager.package_agent('/Users/rama2r/Cerebrum/example/agents/academic_agent')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Upload agents")
+    parser.add_argument(
+        "--agent_path",
+        required=True
+    )
+    args = parser.parse_args()
 
-manager.upload_agent(agent_package)
+    manager = AgentManager('https://my.aios.foundation')
+
+    agent_package = manager.package_agent(args.agent_path)
+
+    manager.upload_agent(agent_package)

@@ -50,7 +50,7 @@ def run_agent(
         client.connect()
         print(f"🚀 Executing agent: {os.path.basename(agent_path)}")
         print(f"📋 Task: {task}")
-
+        
         result = client.execute(agent_path, {"task": task})
         
         try:
@@ -110,13 +110,15 @@ def main():
     )
     parser.add_argument(
         "--agent",
-        default="example/academic_agent",
+        # default="example/academic_agent",
+        required=True,
         help="Path to the agent to execute"
     )
     parser.add_argument(
-        "task",
-        nargs="?",
-        default="Help me search the AIOS paper and introduce its core idea. ",
+        "--task",
+        required=True,
+        # nargs="?",
+        # default="Help me search the AIOS paper and introduce its core idea. ",
         help="Task for the agent to execute"
     )
 

@@ -87,11 +87,13 @@ class FestivalCardDesigner(BaseAgent):
                 "tool_use": []
             },
             {
-                "message": "Generate card layout options",
+                "action_type": "tool_use",
+                "action": "Generate card layout options",
                 "tool_use": ["text_to_image"]
             },
             {
-                "message": "Summarize the card Add textual elements to the festival card ",
+                "action_type": "chat",
+                "action": "Summarize the card with adding textual elements to the festival card ",
                 "tool_use": []
             }
         ]

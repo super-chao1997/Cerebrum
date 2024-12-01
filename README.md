@@ -219,12 +219,12 @@ AIOS provides several `Query` classes for different types of interactions and us
 
 | Query Class | Arguments | Output |
 |:--|:--|:--|
-| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str` = choice("chat", "tool_use", "operate_file"), message_return_type: `str` = choice("text", "json") | response: `Response` |
+| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str` = "chat"|"tool_use"|"operate_file", message_return_type: `str` = "text"|"json" | response: `Response` |
 | `MemoryQuery` | TBD | response: `Response` |
 | `StorageQuery` | TBD | response: `Response` |
 | `ToolQuery` | tool_calls: `List` | response: `Response` |
 
-Here's how to import queries to use
+Here's how to import a specific query
 ```python
 from cerebrum.llm.communication import LLMQuery  # Using LLMQuery as an example
 ```

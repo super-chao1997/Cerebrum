@@ -219,7 +219,7 @@ AIOS provides several `Query` classes for different types of interactions and us
 
 | Query Class | Arguments | Output |
 |:--|:--|:--|
-| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str` = "chat"|"tool_use"|"operate_file", message_return_type: `str` = "text"|"json" | response: `Response` |
+| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str`, message_return_type: `str` | response: `Response` |
 | `MemoryQuery` | TBD | response: `Response` |
 | `StorageQuery` | TBD | response: `Response` |
 | `ToolQuery` | tool_calls: `List` | response: `Response` |

@@ -191,9 +191,7 @@ When setting up your agent, you'll need to specify which tools it will use. Belo
 
 To use these tools in your agent, simply include their reference (from the "How to Use" column) in your agent's configuration file. For example, if you want your agent to be able to search academic papers and convert currencies, you would include both `example/arxiv` and `example/currency_converter` in your configuration.
 
-Want to create your own tools? You can either:
-1. Integrate them directly into your agent for now, or
-2. Check out the implementation examples in the [tool folder](./cerebrum/example/tools/) to learn how to develop standalone tools.
+If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
 
 ### Building Your Agent's Logic
 
@@ -354,6 +352,88 @@ Replace the placeholders with your specific values:
 - `<llm_backend>`: The backend service for the language model
 - `<your_agent_folder_path>`: The path to your agent's folder
 - `<task_input>`: The task you want your agent to perform
+
+## Develop and publish new tools
+### Tool Structure
+Similar as developing new agents, developing tools also need to follow a simple directory structure:
+```
+example/
+└── demo_tool/
+    │── entry.py      # Contains your tool's main logic
+    └── config.json   # Tool configuration and metadata
+```
+
+### Setting Up config.json
+Your tool needs a configuration file that describes its properties. Here's an example of how to set it up:
+
+```json
+{
+    "name": "Your Tool Name",
+    "description": [
+        "A clear description of what your tool does",
+        "You can add multiple lines of description"
+    ],
+    "meta": {
+        "author": "",
+        "version": "",
+        "license": ""
+    },
+    "build": {
+        "entry": "entry.py",
+        "module": "YourToolClass"
+    }
+}
+```
+### Creating Your Tool Class
+In `entry.py`, you'll need to implement a tool class which is identified in the config.json with two essential methods:
+
+1. `get_tool_call_format`: Defines how LLMs should interact with your tool
+2. `run`: Contains your tool's main functionality
+
+Here's an example:
+
+```python
+class YourTool:
+    def get_tool_call_format(self):
+        """
+        Define how LLMs should call your tool.
+        Follow OpenAI's function calling format.
+        """
+        return {
+            "type": "function",
+            "function": {
+                "name": "example/your_tool",
+                "description": "What your tool does",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "param_name": {
+                            "type": "string",
+                            "description": "What this parameter does"
+                        }
+                    },
+                    "required": ["param_name"]
+                }
+            }
+        }
+
+    def run(self, params: dict):
+        """
+        Main tool logic goes here.
+        Args:
+            params: Dictionary containing tool parameters
+        Returns:
+            Your tool's output
+        """
+        # Your code here
+        result = do_something(params['param_name'])
+        return result
+```
+
+### Integration Tips
+When integrating your tool for the agents you develop:
+- Use absolute paths to reference your tool in agent configurations
+- Example: `/path/to/your/tools/example/your_tool` instead of just `author/tool_name`
 
 ## Supported LLM Cores
 | Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ | Backend ⚙️ |

@@ -307,6 +307,6 @@ class AgentManager:
 
 
 if __name__ == "__main__":
-    manager = AgentManager("https://my.aios.foundation/")
+    manager = AgentManager("https://aios.foundation/")
     agent = manager.download_agent("example", "academic_agent")
     print(agent)

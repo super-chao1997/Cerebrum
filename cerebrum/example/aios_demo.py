@@ -112,7 +112,7 @@ def main():
         "--agent",
         # default="example/academic_agent",
         required=True,
-        help="Path to the agent to execute"
+        help="Path or name of the agent to execute"
     )
     parser.add_argument(
         "--task",

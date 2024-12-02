@@ -277,11 +277,11 @@ To use these tools in your agent, simply include their reference (from the "How 
 
 If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
 
-### Build the agent
+### Build Agent
 
 Let's walk through creating your agent's core functionality.
 
-#### Setting up the base agent class
+#### Set up the Base Agent Class
 
 First, create your agent class by inheriting from BaseAgent:
 
@@ -295,7 +295,7 @@ class DemoAgent(BaseAgent):
         pass
 ```
 
-#### Import query functions
+#### Import Query Functions
 
 AIOS provides several `Query` classes for different types of interactions and use the `Response` class in [here](./cerebrum/llm/communication.py) to receive results from the AIOS kernel. 
 
@@ -335,7 +335,7 @@ def build_system_instruction(self):
         self.messages.append({"role": "user", "content": plan_instruction})
 ```
 
-#### Create workflows
+#### Create Workflows
 
 You can create workflows either manually or automatically:
 
@@ -382,7 +382,7 @@ def automatic_workflow(self):
     return None
 ```
 
-#### Implementing the Run Method
+#### Implement the Run Method
 
 Finally, implement the run method to execute your agent's workflow:
 
@@ -424,7 +424,7 @@ def run(self):
         }
 ```
 
-### Running the agent
+### Run the Agent
 
 To test your agent, use the aios_demo.py script:
 
@@ -437,7 +437,7 @@ Replace the placeholders with your specific values:
 - `<your_agent_folder_path>`: The path to your agent's folder
 - `<task_input>`: The task you want your agent to perform
 
-## 🔧Develop and customize new tools
+## 🔧Develop and Customize New Tools
 ### Tool Structure
 Similar as developing new agents, developing tools also need to follow a simple directory structure:
 ```
@@ -447,7 +447,7 @@ example/
     └── config.json   # Tool configuration and metadata
 ```
 
-### Setting Up config.json
+### Setting up config.json
 Your tool needs a configuration file that describes its properties. Here's an example of how to set it up:
 
 ```json
@@ -468,7 +468,7 @@ Your tool needs a configuration file that describes its properties. Here's an ex
     }
 }
 ```
-### Creating Your Tool Class
+### Create Tool Class
 In `entry.py`, you'll need to implement a tool class which is identified in the config.json with two essential methods:
 
 1. `get_tool_call_format`: Defines how LLMs should interact with your tool

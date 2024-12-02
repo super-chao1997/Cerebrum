@@ -116,7 +116,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    Code file is located at `cerebrum/example/aios_demo_concurrent.py`
 
 
-# 🚀 Developing and Publishing Your Agents
+## 🚀 Develop and customize new agents
 
 This guide will walk you through creating and publishing your own agents for AIOS. 
 ### Agent Structure
@@ -353,7 +353,7 @@ Replace the placeholders with your specific values:
 - `<your_agent_folder_path>`: The path to your agent's folder
 - `<task_input>`: The task you want your agent to perform
 
-## Develop and publish new tools
+## 🔧Develop and customize new tools
 ### Tool Structure
 Similar as developing new agents, developing tools also need to follow a simple directory structure:
 ```

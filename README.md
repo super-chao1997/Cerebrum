@@ -115,6 +115,90 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
    Code file is located at `cerebrum/example/aios_demo_concurrent.py`
 
+## 👤 Getting Started with Your Client
+
+Let's walk through how to set up and customize your client to work with the AIOS kernel. We'll break this down into simple steps.
+
+### Step 1: Initialize Your Client
+First, let's create your client instance:
+```python
+from cerebrum import config
+from cerebrum.client import Cerebrum
+
+client = Cerebrum()
+config.global_client = client
+```
+
+### Step 2: Add Functionality Layers
+The AIOS kernel offers five core modules you can customize:
+- LLM (Language Model)
+- Memory
+- Storage
+- Tools
+- Scheduler
+
+Here's how to add these layers to your client:
+```python
+from cerebrum.llm.layer import LLMLayer
+from cerebrum.memory.layer import MemoryLayer
+from cerebrum.overrides.layer import OverridesLayer
+from cerebrum.storage.layer import StorageLayer
+from cerebrum.tool.layer import ToolLayer
+
+client.add_llm_layer(
+    LLMLayer(llm_name=llm_name, llm_backend=llm_backend)  # Configure your LLM
+).add_storage_layer(
+    StorageLayer(root_dir=root_dir)  # Set storage directory
+).add_memory_layer(
+    MemoryLayer(memory_limit=memory_limit)  # Set memory per agent
+).add_tool_layer(
+    ToolLayer()  # Add tool capabilities
+).override_scheduler(
+    OverridesLayer(max_workers=max_workers)  # Configure scheduling
+)
+```
+
+### Step 3: Run Your Agent
+Now you can run agents and get their results:
+```python
+try:
+    # Connect to the client
+    client.connect()
+    
+    # Execute your agent
+    agent_path = ""  # Your agent's name or path
+    task = ""       # Your task description
+    result = client.execute(agent_path, {"task": task})
+    
+    # Get the results
+    final_result = client.poll_agent(
+        result["execution_id"],
+        timeout=timeout
+    )
+    return final_result
+
+except TimeoutError:
+    return None
+except Exception as e:
+    return None
+finally:
+    client.cleanup()
+```
+
+### Ready-to-Use Demo Agents
+We've prepared several agents you can try right away:
+- `example/academic_agent` - Research assistance
+- `example/cocktail_mixlogist` - Cocktail recipes
+- `example/creation_agent` - Creative tasks
+- `example/festival_card_designer` - Card design
+- `example/language_tutor` - Language learning
+- `example/logo_creator` - Logo design
+- `example/math_agent` - Mathematical help
+- `example/meme_creator` - Meme generation
+- `example/music_composer` - Music composition
+- `example/story_teller` - Storytelling
+
+You can find all these agents in the [example agents folder](./cerebrum/example/agents/). If you would like to customize and develop your new agents, you can check out the guides on [Developing New Agents](#-develop-and-customize-new-agents) and [Developing New Tools](#develop-and-customize-new-tools).
 
 ## 🚀 Develop and customize new agents
 
@@ -143,9 +227,9 @@ example/
 
 Note: If your agent needs any libraries beyond AIOS's built-in ones, make sure to list them in meta_requirements.txt. Apart from the above three files, you can have any other files in your folder. 
 
-### Configuring Your Agent
+### Configure the agent
 
-#### Setting Up Metadata
+#### Set up Metadata
 
 Your agent needs a config.json file that describes its functionality. Here's what it should include:
 
@@ -170,7 +254,7 @@ Your agent needs a config.json file that describes its functionality. Here's wha
 }
 ```
 
-### Available Tools
+### Available tools
 
 When setting up your agent, you'll need to specify which tools it will use. Below is a list of all currently available tools and how to reference them in your configuration:
 
@@ -193,11 +277,11 @@ To use these tools in your agent, simply include their reference (from the "How 
 
 If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
 
-### Building Your Agent's Logic
+### Build the agent
 
 Let's walk through creating your agent's core functionality.
 
-#### 1. Setting Up the Base Class
+#### Setting up the base agent class
 
 First, create your agent class by inheriting from BaseAgent:
 
@@ -211,7 +295,7 @@ class DemoAgent(BaseAgent):
         pass
 ```
 
-#### 2. Using Query Functions
+#### Import query functions
 
 AIOS provides several `Query` classes for different types of interactions and use the `Response` class in [here](./cerebrum/llm/communication.py) to receive results from the AIOS kernel. 
 
@@ -227,7 +311,7 @@ Here's how to import a specific query
 from cerebrum.llm.communication import LLMQuery  # Using LLMQuery as an example
 ```
 
-#### 3. Creating System Instructions
+#### Construct system instructions
 
 Here's how to set up your agent's system instructions:
 
@@ -251,11 +335,11 @@ def build_system_instruction(self):
         self.messages.append({"role": "user", "content": plan_instruction})
 ```
 
-#### 4. Creating Workflows
+#### Create workflows
 
 You can create workflows either manually or automatically:
 
-Manual Workflow Example:
+Manual workflow example:
 ```python
 def manual_workflow(self):
     workflow = [
@@ -273,7 +357,7 @@ def manual_workflow(self):
     return workflow
 ```
 
-Automatic Workflow Example:
+Automatic workflow example:
 ```python
 def automatic_workflow(self):
     for i in range(self.plan_max_fail_times):
@@ -298,7 +382,7 @@ def automatic_workflow(self):
     return None
 ```
 
-#### 5. Implementing the Run Method
+#### Implementing the Run Method
 
 Finally, implement the run method to execute your agent's workflow:
 
@@ -340,7 +424,7 @@ def run(self):
         }
 ```
 
-### Running Your Agent
+### Running the agent
 
 To test your agent, use the aios_demo.py script:
 

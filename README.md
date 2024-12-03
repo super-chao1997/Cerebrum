@@ -93,27 +93,18 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
 2. **Run the AIOS Client**
 
-   Run the client with a single agent
+   Run an agent using the client
    ```bash
-   aios-basic-demo --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
+   run-agent --llm_name <> --llm_backend openai --agent <agent name or agent path> --task <task that agent needs to complete>
    ```
-   which is the same as using 
+   For example, you can run a demo agent using the following command:  
    ```bash
-   python cerebrum/example/aios_demo.py --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent demo_author/demo_agent --task "Tell me what is core idea of AIOS"
    ```
-   Code file is located at `cerebrum/example/aios_demo.py`
+   or you can run the demo agent using its local path
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent /<replace with your local directory of the cerebrum repository>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
 
-   Run the client with agents concurrently
-   
-   ```bash
-   aios-concurrent-demo --llm_name gpt-4o-mini --llm_backend openai
-   ```
-   which is the same as using 
-   ```bash
-   python cerebrum/example/aios_demo_concurrent.py --llm_name gpt-4o-mini --llm_backend openai --agent <replace with the actual agent> --task <replace with the actual task>
-   ```
-
-   Code file is located at `cerebrum/example/aios_demo_concurrent.py`
+   Code file is located at `cerebrum/example/run_agent.py`
 
 ## 👤 Getting Started with Your Client
 
@@ -146,15 +137,15 @@ from cerebrum.storage.layer import StorageLayer
 from cerebrum.tool.layer import ToolLayer
 
 client.add_llm_layer(
-    LLMLayer(llm_name=llm_name, llm_backend=llm_backend)  # Configure your LLM
+    LLMLayer(llm_name="gpt-4o-mini", llm_backend="openai")  # Configure your LLM
 ).add_storage_layer(
-    StorageLayer(root_dir=root_dir)  # Set storage directory
+    StorageLayer(root_dir="root")  # Set storage directory
 ).add_memory_layer(
-    MemoryLayer(memory_limit=memory_limit)  # Set memory per agent
+    MemoryLayer(memory_limit=104857600)  # Set memory per agent
 ).add_tool_layer(
     ToolLayer()  # Add tool capabilities
 ).override_scheduler(
-    OverridesLayer(max_workers=max_workers)  # Configure scheduling
+    OverridesLayer(max_workers=32)  # Configure scheduling
 )
 ```
 
@@ -166,37 +157,25 @@ try:
     client.connect()
     
     # Execute your agent
-    agent_path = ""  # Your agent's name or path
-    task = ""       # Your task description
+    agent_path = "demo_author/demo_agent"  # Your agent's name or path
+    task = "Tell me what is core idea of AIOS"       # Your task description
     result = client.execute(agent_path, {"task": task})
     
     # Get the results
     final_result = client.poll_agent(
         result["execution_id"],
-        timeout=timeout
+        timeout=300
     )
-    return final_result
+    print("📋 Task result:", final_result)
+    print("✅ Task completed")
 
 except TimeoutError:
-    return None
+    print("❌ Task timed out")
 except Exception as e:
-    return None
+    print(f"❌ Failed to execute task: {str(e)}")
 finally:
     client.cleanup()
 ```
-
-### Ready-to-Use Demo Agents
-We've prepared several agents you can try right away:
-- `example/academic_agent` - Research assistance
-- `example/cocktail_mixlogist` - Cocktail recipes
-- `example/creation_agent` - Creative tasks
-- `example/festival_card_designer` - Card design
-- `example/language_tutor` - Language learning
-- `example/logo_creator` - Logo design
-- `example/math_agent` - Mathematical help
-- `example/meme_creator` - Meme generation
-- `example/music_composer` - Music composition
-- `example/story_teller` - Storytelling
 
 You can find all these agents in the [example agents folder](./cerebrum/example/agents/). If you would like to customize and develop your new agents, you can check out the guides on [Developing New Agents](#-develop-and-customize-new-agents) and [Developing New Tools](#develop-and-customize-new-tools).
 
@@ -235,17 +214,17 @@ Your agent needs a config.json file that describes its functionality. Here's wha
 
 ```json
 {
-   "name": "name of the agent",
+   "name": "demo_agent",
    "description": [
-      "description of the agent functionality"
+      "Demo agent that can help search AIOS-related papers"
    ],
    "tools": [
-      "tools need to be used"
+      "demo_author/arxiv"
    ],
    "meta": {
-      "author": "",
-      "version": "",
-      "license": ""
+      "author": "demo_author",
+      "version": "0.0.1",
+      "license": "CC0"
    },
    "build": {
       "entry": "entry file to start the agent",
@@ -258,7 +237,7 @@ Your agent needs a config.json file that describes its functionality. Here's wha
 
 When setting up your agent, you'll need to specify which tools it will use. Below is a list of all currently available tools and how to reference them in your configuration:
 
-| Author | Name | How to Use |
+| Author | Name | How to call them |
 |:--|:--|:--|
 | example | arxiv | example/arxiv |
 | example | bing_search | example/bing_search |

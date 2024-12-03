@@ -102,7 +102,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    run-agent --llm_name gpt-4o-mini --llm_backend openai --agent demo_author/demo_agent --task "Tell me what is core idea of AIOS"
    ```
    or you can run the demo agent using its local path
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent /<replace with your local directory of the cerebrum repository>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
 
    Code file is located at `cerebrum/example/run_agent.py`
 
@@ -227,8 +227,8 @@ Your agent needs a config.json file that describes its functionality. Here's wha
       "license": "CC0"
    },
    "build": {
-      "entry": "entry file to start the agent",
-      "module": "the module name of the agent"
+      "entry": "agent.py",
+      "module": "DemoAgent"
    }
 }
 ```

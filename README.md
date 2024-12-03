@@ -95,7 +95,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
    Run an agent using the client
    ```bash
-   run-agent --llm_name <> --llm_backend openai --agent <agent name or agent path> --task <task that agent needs to complete>
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent <agent name or agent path> --task <task that agent needs to complete>
    ```
    For example, you can run a demo agent using the following command:  
    ```bash

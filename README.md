@@ -266,12 +266,24 @@ First, create your agent class by inheriting from BaseAgent:
 
 ```python
 from cerebrum.agents.base import BaseAgent
+from cerebrum.llm.communication import LLMQuery
 import json
 
 class DemoAgent(BaseAgent):
     def __init__(self, agent_name, task_input, config_):
         super().__init__(agent_name, task_input, config_)
-        pass
+
+        self.plan_max_fail_times = 3
+        self.tool_call_max_fail_times = 3
+
+        self.start_time = None
+        self.end_time = None
+        self.request_waiting_times: list = []
+        self.request_turnaround_times: list = []
+        self.task_input = task_input
+        self.messages = []
+        self.workflow_mode = "manual"  # (manual, automatic)
+        self.rounds = 0
 ```
 
 #### Import Query Functions
@@ -298,68 +310,61 @@ Here's how to set up your agent's system instructions:
 def build_system_instruction(self):
     prefix = "".join(["".join(self.config["description"])])
 
-    plan_instruction = "".join([
-        f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
-        "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
-        "The plan must follow this JSON format: ",
-        "[",
-        '{"action_type": "action_type_value", "action": "action_value", "tool_use": [tool_name1, tool_name2,...]}',
-        "]",
-    ])
+    plan_instruction = "".join(
+        [
+            f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
+            "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
+            "The plan must follow the json format as below: ",
+            "[",
+            '{"action_type": "action_type_value", "action": "action_value","tool_use": [tool_name1, tool_name2,...]}',
+            '{"action_type": "action_type_value", "action": "action_value", "tool_use": [tool_name1, tool_name2,...]}',
+            "...",
+            "]",
+            "In each step of the planned plan, identify tools to use and recognize no tool is necessary. ",
+            "Followings are some plan examples. ",
+            "[" "[",
+            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
+            '{"action_type": "chat", "action": "write a summarization based on the gathered information. ", "tool_use": []}',
+            "];",
+            "[",
+            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
+            '{"action_type": "chat", "action": "understand the current methods and propose ideas that can improve ", "tool_use": []}',
+            "]",
+            "]",
+        ]
+    )
 
     if self.workflow_mode == "manual":
         self.messages.append({"role": "system", "content": prefix})
+
     else:
+        assert self.workflow_mode == "automatic"
         self.messages.append({"role": "system", "content": prefix})
         self.messages.append({"role": "user", "content": plan_instruction})
 ```
 
 #### Create Workflows
 
-You can create workflows either manually or automatically:
+You can create a workflow for the agent to execute its task.
 
 Manual workflow example:
 ```python
 def manual_workflow(self):
     workflow = [
         {
-            "action_type": "chat",
-            "action": "Identify user's goals and create explanations",
-            "tool_use": []
+            "action_type": "tool_use",
+            "action": "Search for relevant papers",
+            "tool_use": ["demo_author/arxiv"],
         },
         {
             "action_type": "chat",
-            "action": "Provide examples",
-            "tool_use": []
-        }
+            "action": "Provide responses based on the user's query",
+            "tool_use": [],
+        },
     ]
     return workflow
 ```
 
-Automatic workflow example:
-```python
-def automatic_workflow(self):
-    for i in range(self.plan_max_fail_times):
-        response = self.send_request(
-            agent_name=self.agent_name,
-            query=LLMQuery(
-                messages=self.messages, 
-                tools=None, 
-                message_return_type="json"
-            ),
-        )["response"]
-
-        workflow = self.check_workflow(response.response_message)
-        
-        if workflow:
-            return workflow
-        
-        self.messages.append({
-            "role": "assistant",
-            "content": f"Attempt {i+1} failed to generate a valid plan. Retrying..."
-        })
-    return None
-```
 
 #### Implement the Run Method
 
@@ -368,59 +373,106 @@ Finally, implement the run method to execute your agent's workflow:
 ```python
 def run(self):
     self.build_system_instruction()
-    
-    # Add task input to messages
-    self.messages.append({"role": "user", "content": self.task_input})
-    
-    # Get workflow
-    workflow = self.automatic_workflow() if self.workflow_mode == "automatic" else self.manual_workflow()
-    
-    if not workflow:
-        return {
-            "agent_name": self.agent_name,
-            "result": "Failed to generate a valid workflow",
-            "rounds": self.rounds
+
+    task_input = self.task_input
+
+    self.messages.append({"role": "user", "content": task_input})
+
+    workflow = None
+
+    if self.workflow_mode == "automatic":
+        workflow = self.automatic_workflow()
+        self.messages = self.messages[:1]  # clear long context
+
+    else:
+        assert self.workflow_mode == "manual"
+        workflow = self.manual_workflow()
+
+    self.messages.append(
+        {
+            "role": "user",
+            "content": f"[Thinking]: The workflow generated for the problem is {json.dumps(workflow)}. Follow the workflow to solve the problem step by step. ",
         }
-    
+    )
+
     try:
-        final_result = ""
-        for i, step in enumerate(workflow):
-            # Execute each step in the workflow
-            response = self.execute_step(step, i)
-            final_result = response.response_message
+        if workflow:
+            final_result = ""
+
+            for i, step in enumerate(workflow):
+                action_type = step["action_type"]
+                action = step["action"]
+                tool_use = step["tool_use"]
+
+                prompt = f"At step {i + 1}, you need to: {action}. "
+                self.messages.append({"role": "user", "content": prompt})
+
+                if tool_use:
+                    selected_tools = self.pre_select_tools(tool_use)
+
+                else:
+                    selected_tools = None
+
+                response = self.send_request(
+                    agent_name=self.agent_name,
+                    query=LLMQuery(
+                        messages=self.messages,
+                        tools=selected_tools,
+                        action_type=action_type,
+                    ),
+                )["response"]
+                
+                self.messages.append({"role": "assistant", "content": response.response_message})
+
+                self.rounds += 1
+
+
+            final_result = self.messages[-1]["content"]
             
-        return {
-            "agent_name": self.agent_name,
-            "result": final_result,
-            "rounds": self.rounds
-        }
-        
+            return {
+                "agent_name": self.agent_name,
+                "result": final_result,
+                "rounds": self.rounds,
+            }
+
+        else:
+            return {
+                "agent_name": self.agent_name,
+                "result": "Failed to generate a valid workflow in the given times.",
+                "rounds": self.rounds,
+            }
+            
     except Exception as e:
-        return {
-            "agent_name": self.agent_name,
-            "result": f"Error occurred: {str(e)}",
-            "rounds": self.rounds
-        }
+        return {}
 ```
 
 ### Run the Agent
-
-To test your agent, use the aios_demo.py script:
+To test your agent, use the run_agent command to run:
 
 ```bash
-python aios_demo.py --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
+run-agent --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
 ```
 Replace the placeholders with your specific values:
 - `<llm_name>`: The name of the language model you want to use
 - `<llm_backend>`: The backend service for the language model
 - `<your_agent_folder_path>`: The path to your agent's folder
-- `<task_input>`: The task you want your agent to perform
+- `<task_input>`: The task you want your agent to complete
+
+or you can run the agent using the source code in the cerebrum/example/run_agent
+```bash
+python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
+```
+Replace the placeholders with your specific values:
+- `<llm_name>`: The name of the language model you want to use
+- `<llm_backend>`: The backend service for the language model
+- `<your_agent_folder_path>`: The path to your agent's folder
+- `<task_input>`: The task you want your agent to complete
 
 ## 🔧Develop and Customize New Tools
 ### Tool Structure
 Similar as developing new agents, developing tools also need to follow a simple directory structure:
 ```
-example/
+demo_author/
 └── demo_tool/
     │── entry.py      # Contains your tool's main logic
     └── config.json   # Tool configuration and metadata
@@ -431,19 +483,18 @@ Your tool needs a configuration file that describes its properties. Here's an ex
 
 ```json
 {
-    "name": "Your Tool Name",
+    "name": "arxiv",
     "description": [
-        "A clear description of what your tool does",
-        "You can add multiple lines of description"
+        "The arxiv tool that can be used to search for papers on arxiv"
     ],
     "meta": {
-        "author": "",
-        "version": "",
-        "license": ""
+        "author": "demo_author",
+        "version": "1.0.6",
+        "license": "CC0"
     },
     "build": {
-        "entry": "entry.py",
-        "module": "YourToolClass"
+        "entry": "tool.py",
+        "module": "Arxiv"
     }
 }
 ```
@@ -456,29 +507,28 @@ In `entry.py`, you'll need to implement a tool class which is identified in the 
 Here's an example:
 
 ```python
-class YourTool:
+class Arxiv:
     def get_tool_call_format(self):
-        """
-        Define how LLMs should call your tool.
-        Follow OpenAI's function calling format.
-        """
-        return {
+        tool_call_format = {
             "type": "function",
             "function": {
-                "name": "example/your_tool",
-                "description": "What your tool does",
+                "name": "demo_author/arxiv",
+                "description": "Query articles or topics in arxiv",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "param_name": {
+                        "query": {
                             "type": "string",
-                            "description": "What this parameter does"
+                            "description": "Input query that describes what to search in arxiv"
                         }
                     },
-                    "required": ["param_name"]
+                    "required": [
+                        "query"
+                    ]
                 }
             }
         }
+        return tool_call_format
 
     def run(self, params: dict):
         """

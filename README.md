@@ -85,12 +85,16 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    ```bash
    run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <agent name or agent path> --task <task that agent needs to complete>
    ```
-   For example, you can run a demo agent using the following command:  
+   For the agent_name_or_path argument, you can either pass the agent names (in the format of author_name/agent_name) that are available on the [agenthub](https://app.aios.foundation/agenthub), or pass the absolute path for the agent folder in your computer. 
+
+   For example, you can run a demo agent avaiable on the agenthub using the following command:  
    ```bash
    run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path demo_author/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url http://localhost:8000
    ```
-   or you can run the demo agent using its local path
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
+   or you can run the demo agent by passing the absolute path of the agent folder in your computer
+   ```bash
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url "http://localhost:8000"
+   ```
 
    Code file is located at `cerebrum/example/run_agent.py`
 
@@ -450,7 +454,7 @@ Replace the placeholders with your specific values:
 
 or you can run the agent using the source code in the cerebrum/example/run_agent
 ```bash
-python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <your_agent_folder_path> --task <task_input> --aios_kernel_url http://localhost:8000
+python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <agent_name_or_path>> --task <task_input> --aios_kernel_url <aios_kernel_url>
 ```
 Replace the placeholders with your specific values:
 - `<llm_name>`: The name of the language model you want to use

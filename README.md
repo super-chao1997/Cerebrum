@@ -83,14 +83,14 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
    Run an agent using the client
    ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent <agent name or agent path> --task <task that agent needs to complete>
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <agent name or agent path> --task <task that agent needs to complete>
    ```
    For example, you can run a demo agent using the following command:  
    ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent demo_author/demo_agent --task "Tell me what is core idea of AIOS"
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path demo_author/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url "http://localhost:8000"
    ```
    or you can run the demo agent using its local path
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
 
    Code file is located at `cerebrum/example/run_agent.py`
 
@@ -104,7 +104,9 @@ First, let's create your client instance:
 from cerebrum import config
 from cerebrum.client import Cerebrum
 
-client = Cerebrum()
+aios_kernel_url = "http://localhost:8000"
+
+client = Cerebrum(base_url = aios_kernel_url)
 config.global_client = client
 ```
 
@@ -292,7 +294,7 @@ from cerebrum.llm.communication import LLMQuery  # Using LLMQuery as an example
 
 #### Construct system instructions
 
-Here's how to set up your agent's system instructions:
+Here's how to set up your agent's system instructions and you need to put this function inside your agent class
 
 ```python
 def build_system_instruction(self):
@@ -333,7 +335,7 @@ def build_system_instruction(self):
 
 #### Create Workflows
 
-You can create a workflow for the agent to execute its task.
+You can create a workflow for the agent to execute its task and you need to put this function inside your agent class. 
 
 Manual workflow example:
 ```python
@@ -356,7 +358,7 @@ def manual_workflow(self):
 
 #### Implement the Run Method
 
-Finally, implement the run method to execute your agent's workflow:
+Finally, implement the run method to execute your agent's workflow and you need to put this function inside your agent class. 
 
 ```python
 def run(self):
@@ -438,7 +440,7 @@ def run(self):
 To test your agent, use the run_agent command to run:
 
 ```bash
-run-agent --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
+run-agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <agent_name_or_path> --task <task_input>
 ```
 Replace the placeholders with your specific values:
 - `<llm_name>`: The name of the language model you want to use
@@ -448,12 +450,12 @@ Replace the placeholders with your specific values:
 
 or you can run the agent using the source code in the cerebrum/example/run_agent
 ```bash
-python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent <your_agent_folder_path> --task <task_input>
+python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <your_agent_folder_path> --task <task_input> --aios_kernel_url http://localhost:8000
 ```
 Replace the placeholders with your specific values:
 - `<llm_name>`: The name of the language model you want to use
 - `<llm_backend>`: The backend service for the language model
-- `<your_agent_folder_path>`: The path to your agent's folder
+- `<agent_name_or_path>`: The path to your agent's folder
 - `<task_input>`: The task you want your agent to complete
 
 ## 🔧Develop and Customize New Tools

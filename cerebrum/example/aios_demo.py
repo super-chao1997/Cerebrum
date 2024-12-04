@@ -17,9 +17,10 @@ def setup_client(
     root_dir: str = "root",
     memory_limit: int = 500*1024*1024,
     max_workers: int = 32,
+    aios_kernel_url: str = "localhost:8000"
 ) -> Cerebrum:
     """Initialize and configure the Cerebrum client with specified parameters."""
-    client = Cerebrum()
+    client = Cerebrum(base_url=aios_kernel_url)
     config.global_client = client
 
     try:
@@ -41,17 +42,17 @@ def setup_client(
 
 def run_agent(
     client: Cerebrum,
-    agent_path: str,
+    agent_name_or_path: str,
     task: str,
     timeout: int = 300
 ) -> Optional[Dict[str, Any]]:
     """Run an agent with the specified task and wait for results."""
     try:
         client.connect()
-        print(f"🚀 Executing agent: {os.path.basename(agent_path)}")
+        print(f"🚀 Executing agent: {os.path.basename(agent_name_or_path)}")
         print(f"📋 Task: {task}")
         
-        result = client.execute(agent_path, {"task": task})
+        result = client.execute(agent_name_or_path, {"task": task})
         
         try:
             final_result = client.poll_agent(
@@ -109,7 +110,7 @@ def main():
         help="Timeout in seconds"
     )
     parser.add_argument(
-        "--agent",
+        "--agent_name_or_path",
         # default="example/academic_agent",
         required=True,
         help="Path or name of the agent to execute"
@@ -121,6 +122,10 @@ def main():
         # default="Help me search the AIOS paper and introduce its core idea. ",
         help="Task for the agent to execute"
     )
+    parser.add_argument(
+        "--aios_kernel_url",
+        required=True
+    )
 
     args = parser.parse_args()
 
@@ -130,7 +135,7 @@ def main():
     print(f"  Memory Limit: {args.memory_limit} bytes")
     print(f"  Max Workers: {args.max_workers}")
     print(f"  Timeout: {args.timeout} seconds")
-    print(f"  Agent: {args.agent}")
+    print(f"  Agent: {args.agent_name_or_path}")
     print(f"  Task: {args.task}")
     print("-" * 50)
 
@@ -140,12 +145,13 @@ def main():
             llm_backend=args.llm_backend,
             root_dir=args.root_dir,
             memory_limit=args.memory_limit,
-            max_workers=args.max_workers
+            max_workers=args.max_workers,
+            aios_kernel_url=args.aios_kernel_url
         )
 
         result = run_agent(
             client=client,
-            agent_path=args.agent,
+            agent_name_or_path=args.agent_name_or_path,
             task=args.task,
             timeout=args.timeout
         )

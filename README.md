@@ -87,7 +87,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    ```
    For example, you can run a demo agent using the following command:  
    ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path demo_author/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url "localhost:8000"
+   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path demo_author/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url http://localhost:8000
    ```
    or you can run the demo agent using its local path
    run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS"
@@ -104,7 +104,7 @@ First, let's create your client instance:
 from cerebrum import config
 from cerebrum.client import Cerebrum
 
-aios_kernel_url = "localhost:8000"
+aios_kernel_url = "http://localhost:8000"
 
 client = Cerebrum(base_url = aios_kernel_url)
 config.global_client = client

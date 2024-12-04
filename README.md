@@ -18,18 +18,6 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 
 ## Installation
 
-### Standard Installation
-
-1. **Install the package**
-   ```bash
-   pip install aios-agent-sdk
-   ```
-
-4. **Verify installation**
-   ```bash
-   python -c "import cerebrum; from cerebrum.client import Cerebrum; print(Cerebrum)"
-   ```
-
 ### Install From Source
 1. **Clone Repo**
    ```bash

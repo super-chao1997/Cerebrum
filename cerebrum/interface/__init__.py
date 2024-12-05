@@ -21,7 +21,7 @@ class AutoLLM:
 
 
 class AutoTool:
-    TOOL_MANAGER = ToolManager('https://aios.foundation')
+    TOOL_MANAGER = ToolManager('https://app.aios.foundation')
 
     @classmethod
     def from_preloaded(cls, tool_name: str):

@@ -5,7 +5,7 @@ from cerebrum.runtime.process import LLMProcessor, RunnableAgent
 from .. import config
  
 class AutoAgent:
-    AGENT_MANAGER = AgentManager('https://my.aios.foundation')
+    AGENT_MANAGER = AgentManager('https://app.aios.foundation')
  
     @classmethod
     def from_preloaded(cls, agent_name: str):
@@ -28,11 +28,15 @@ class AutoTool:
         n_slash = tool_name.count('/')
         if n_slash == 1: # load from author/name
         # if tool_name.split('/')[0] != 'core':
-            author, name, version = cls.TOOL_MANAGER.download_tool(
-                author=tool_name.split('/')[0],
-                name=tool_name.split('/')[1]
-            )
-            tool, _ = cls.TOOL_MANAGER.load_tool(author, name, version)
+            try:
+                author, name, version = cls.TOOL_MANAGER.download_tool(
+                    author=tool_name.split('/')[0],
+                    name=tool_name.split('/')[1]
+                )
+                tool, _ = cls.TOOL_MANAGER.load_tool(author, name, version)
+            except:
+                print('reload',tool_name.split('/')[1])
+                tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name.split('/')[1])
         else:
             tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name)
         
@@ -47,6 +51,7 @@ class AutoTool:
         }
 
         for tool_name in tool_names:
+             print('tool name', tool_name)
              tool = AutoTool.from_preloaded(tool_name)
 
              response['tools'].append(tool.get_tool_call_format())

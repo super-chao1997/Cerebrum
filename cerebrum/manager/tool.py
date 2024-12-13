@@ -97,6 +97,8 @@ class ToolManager:
                 local: bool = False):
         """Load a tool dynamically and return its class and configuration."""
 
+        print('local', local)
+        
         if not local:
             if version is None:
                 cached_versions = self._get_cached_versions(author, name)

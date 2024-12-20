@@ -53,8 +53,13 @@ jobs:
     # Run AIOS kernel
     - name: Run AIOS kernel in background
       env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'AIzaSyCx0VNhObFu0ta95xDfBx4IKJuyiPTXqbQ' }}
       run: |
+        # Check if using default test key
+        if [ "$GEMINI_API_KEY" = "AIzaSyCx0VNhObFu0ta95xDfBx4IKJuyiPTXqbQ" ]; then
+          echo "Notice: Using test API key - For testing purposes only"
+        fi
+        
         cd aios_root
         bash runtime/launch_kernel.sh &>../kernel.log &
         KERNEL_PID=$!
@@ -93,8 +98,13 @@ jobs:
     # Run integration test
     - name: Run integration test
       env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'AIzaSyCx0VNhObFu0ta95xDfBx4IKJuyiPTXqbQ' }}
       run: |
+        # Check if using default test key
+        if [ "$GEMINI_API_KEY" = "AIzaSyCx0VNhObFu0ta95xDfBx4IKJuyiPTXqbQ" ]; then
+          echo "Notice: Using test API key - For testing purposes only"
+        fi
+        
         # Debug information
         echo "Checking kernel status..."
         curl -v http://localhost:8000/health || true
@@ -110,6 +120,18 @@ jobs:
           --task "Tell me what is core idea of AIOS" \
           --aios_kernel_url http://localhost:8000 \
           2>&1 | tee agent.log
+        
+        # Check for error patterns
+        if grep -q "Failed to initialize client: 500 Server Error" agent.log; then
+          echo "Error: LLM initialization failed. Please check your API key configuration."
+          exit 1
+        fi
+        
+        # Check if completed successfully
+        if ! grep -q "Final Result:" agent.log; then
+          echo "Error: Agent did not complete successfully"
+          exit 1
+        fi
     # Upload logs
     - name: Upload logs
       if: always()

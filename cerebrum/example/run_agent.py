@@ -5,22 +5,31 @@ from cerebrum.memory.layer import MemoryLayer
 from cerebrum.overrides.layer import OverridesLayer
 from cerebrum.storage.layer import StorageLayer
 from cerebrum.tool.layer import ToolLayer
+from cerebrum.manager.tool import ToolManager
 import argparse
 import os
 import sys
 from typing import Optional, Dict, Any
+import json
+from cerebrum.config.config_manager import config
 
 
 def setup_client(
     llm_name: str,
     llm_backend: str,
-    root_dir: str = "root",
-    memory_limit: int = 500*1024*1024,
-    max_workers: int = 32,
-    aios_kernel_url: str = "localhost:8000"
+    root_dir: str = None,
+    memory_limit: int = None,
+    max_workers: int = None,
+    aios_kernel_url: str = None
 ) -> Cerebrum:
     """Initialize and configure the Cerebrum client with specified parameters."""
-    client = Cerebrum(base_url=aios_kernel_url)
+    # Use config values or override with provided parameters
+    base_url = aios_kernel_url or config.get('kernel', 'base_url')
+    root_dir = root_dir or config.get('client', 'root_dir')
+    memory_limit = memory_limit or config.get('client', 'memory_limit')
+    max_workers = max_workers or config.get('client', 'max_workers')
+    
+    client = Cerebrum(base_url=base_url)
     config.global_client = client
 
     try:
@@ -41,10 +50,11 @@ def setup_client(
 
 
 def run_agent(
-    client: Cerebrum,
+    client,
     agent_name_or_path: str,
     task: str,
-    timeout: int = 300
+    timeout: int = 300,
+    local_agent: bool = False
 ) -> Optional[Dict[str, Any]]:
     """Run an agent with the specified task and wait for results."""
     try:
@@ -52,7 +62,21 @@ def run_agent(
         print(f"🚀 Executing agent: {os.path.basename(agent_name_or_path)}")
         print(f"📋 Task: {task}")
         
-        result = client.execute(agent_name_or_path, {"task": task})
+        # Handle local agent path
+        if local_agent:
+            abs_agent_path = os.path.abspath(agent_name_or_path)
+            if not os.path.exists(abs_agent_path):
+                raise ValueError(f"Local agent path not found: {abs_agent_path}")
+            print(f"Using local agent from: {abs_agent_path}")
+            result = client.execute(
+                abs_agent_path,
+                {"task": task, "local_agent": True}
+            )
+        else:
+            result = client.execute(
+                agent_name_or_path,
+                {"task": task}
+            )
         
         try:
             final_result = client.poll_agent(
@@ -74,58 +98,84 @@ def run_agent(
 
 def main():
     """Main entry point for the demo script."""
-    parser = argparse.ArgumentParser(description="AIOS Agent Demo")
+    parser = argparse.ArgumentParser(description="Run an AIOS agent")
+    
+    # Original parameters
     parser.add_argument(
-        "--llm_name", 
-        help="LLM model to use",
-        required=True
+        "--llm_name",
+        type=str,
+        required=True,
+        help="Name of the LLM to use"
     )
+    
     parser.add_argument(
         "--llm_backend",
-        help="Backend service to use",
+        type=str,
         required=True,
-        choices=["openai", "google", "anthropic", "huggingface", "ollama", "vllm"]
+        choices=["openai", "google", "anthropic", "huggingface", "ollama", "vllm"],
+        help="Backend service for the LLM"
     )
+    
     parser.add_argument(
-        "--root-dir",
+       "--agent_name_or_path",
+        type=str,
+        required=True,
+        help="Name or path of the agent to run"
+    )
+
+    # Add new parameters
+    parser.add_argument(
+        "--local_agent",
+        type=str,
+        choices=['yes', 'no', 'true', 'false'],
+        default='no',
+        help="Whether to use a local agent (yes/no or true/false)"
+    )
+
+    # Add aios_kernel_url parameter
+    parser.add_argument(
+        "--aios_kernel_url",
+        type=str,
+        default="http://35.232.56.61:8000",
+        required=True,
+        help="URL of the AIOS kernel"
+    )
+    
+    # Add other necessary parameters
+    parser.add_argument(
+        "--root_dir",
+        type=str,
         default="root",
         help="Root directory for storage"
     )
+    
     parser.add_argument(
-        "--memory-limit",
+        "--memory_limit",
         type=int,
-        default=500*1024*1024,
+        default=config.get('client', 'memory_limit'),
         help="Memory limit in bytes"
     )
+    
     parser.add_argument(
-        "--max-workers",
+        "--max_workers",
         type=int,
-        default=32,
+        default=config.get('client', 'max_workers'),
         help="Maximum number of workers"
     )
+    
     parser.add_argument(
         "--timeout",
         type=int,
         default=300,
         help="Timeout in seconds"
     )
-    parser.add_argument(
-        "--agent_name_or_path",
-        # default="example/academic_agent",
-        required=True,
-        help="Path or name of the agent to execute"
-    )
+
+    # Add a task parameter
     parser.add_argument(
         "--task",
+        type=str,
         required=True,
-        # nargs="?",
-        # default="Help me search the AIOS paper and introduce its core idea. ",
-        help="Task for the agent to execute"
-    )
-    parser.add_argument(
-        "--aios_kernel_url",
-        default = "http://35.232.56.61:8000",
-        required=True
+        help="Task for the agent to complete"
     )
 
     args = parser.parse_args()
@@ -150,11 +200,15 @@ def main():
             aios_kernel_url=args.aios_kernel_url
         )
 
+        # Convert local_agent string to boolean value
+        is_local_agent = args.local_agent.lower() in ['yes', 'true']
+
         result = run_agent(
             client=client,
             agent_name_or_path=args.agent_name_or_path,
             task=args.task,
-            timeout=args.timeout
+            timeout=args.timeout,
+            local_agent=is_local_agent
         )
 
         if result:

@@ -3,8 +3,8 @@ from typing import Any, Type
 # from cerebrum.agents.base import BaseAgent
 # from cerebrum.llm.base import BaseLLM
 from cerebrum.client import Cerebrum
-from cerebrum.llm.communication import LLMQuery
-from cerebrum.utils.chat import Query
+from cerebrum.llm.apis import LLMQuery
+from cerebrum.utils.communication import Query
 
 class LLMProcessor:
     def __init__(self, client: Cerebrum):

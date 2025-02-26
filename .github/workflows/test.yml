@@ -98,7 +98,7 @@ jobs:
 
     - name: Pull Ollama models
       run: |
-        ollama pull llama3:8b
+        ollama pull qwen2.5:7b
 
     - name: Run Ollama serve
       run: |
@@ -114,12 +114,8 @@ jobs:
         netstat -tlpn | grep 8000 || true
         
         # Run the test
-        run-agent \
-          --llm_name llama3:8b \
-          --llm_backend ollama \
-          --agent_name_or_path demo_author/demo_agent \
-          --task "Tell me what is core idea of AIOS" \
-          --aios_kernel_url http://localhost:8000 \
+        run-agent-test \
+          --task_input "Tell me what is the core idea of AIOS?" \
           2>&1 | tee agent.log
         
         # Check for error patterns

@@ -2,7 +2,7 @@ from dataclasses import asdict
 from typing import Optional, Dict, Any, List
 import requests
 
-from cerebrum.llm.communication import LLMQuery
+from cerebrum.llm.apis import LLMQuery
 from cerebrum.overrides.layer import OverridesLayer
 from cerebrum.memory.layer import MemoryLayer
 from cerebrum.llm.layer import LLMLayer

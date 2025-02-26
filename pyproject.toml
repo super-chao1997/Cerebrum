@@ -42,6 +42,7 @@ files = ["requirements.txt"]
 
 [project.scripts]
 run-agent = "cerebrum.example.run_agent:main"
+run-agent-test = "cerebrum.example.agents.test_agent.agent:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

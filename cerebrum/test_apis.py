@@ -1,19 +1,51 @@
-from cerebrum.llm.communication import LLMQuery
-from cerebrum.storage.communication import StorageQuery
-
-from cerebrum.apis import chat, call_tool, retrieve, mount, create_file, create_dir, write_file, roll_back, share_file
-import json
+from cerebrum.llm.apis import llm_chat, llm_call_tool, llm_operate_file
+from cerebrum.memory.apis import alloc_memory, read_memory, write_memory, clear_memory
+from cerebrum.storage.apis import mount, retrieve, create_file, create_dir, write_file, roll_back, share_file
+from cerebrum.tool.apis import call_tool
 
 from cerebrum.interface import AutoTool
 
 from typing import List, Dict, Any
 
-def test_chat():
+def test_single_llm_chat():
     messages=[{"role": "user", "content": "What is the capital of France?"}]
-    response = chat(agent_name="test", messages=messages, base_url="http://localhost:8000")
+    response = llm_chat(
+        agent_name="test", 
+        messages=messages, 
+        base_url="http://localhost:8000", 
+        llms=[
+            {"name": "gemini-1.5-flash","backend":"google"}
+        ]
+    )
+    print(response)
+
+def test_multi_llm_chat():
+    messages=[{"role": "user", "content": "What is the capital of France?"}]
+    response = llm_chat(
+        agent_name="test", 
+        messages=messages, 
+        base_url="http://localhost:8000", 
+        llms=[
+            {"name": "gemini-1.5-flash","backend":"google"},
+            {"name": "qwen2.5-7b","backend":"ollama"}
+        ]
+    )
     print(response)
     
-def test_call_tool():
+    messages=[{"role": "user", "content": "What is the capital of United States?"}]
+    response = llm_chat(
+        agent_name="test", 
+        messages=messages, 
+        base_url="http://localhost:8000", 
+        llms=[
+            {"name": "gemini-1.5-flash","backend":"google"},
+            {"name": "qwen2.5:7b","backend":"ollama"}
+        ]
+    )
+    
+    print(response)
+    
+def test_llm_call_tool():
     messages=[{"role": "user", "content": "Tell me the core idea of OpenAGI paper"}]
     # tool = AutoTool.from_preloaded("demo_author/arxiv")
     tools = [
@@ -59,8 +91,9 @@ def test_create_dir():
 if __name__ == "__main__":
     # agent = TestAgent("test_agent", "What is the capital of France?")
     # agent.run()
-    test_chat()
-    test_call_tool()
+    test_single_llm_chat()
+    test_multi_llm_chat()
+    # test_call_tool()
     # test_operate_file()
     # test_mount()
     # test_create_file()

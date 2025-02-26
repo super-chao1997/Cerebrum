@@ -33,11 +33,12 @@ def setup_client(
     config.global_client = client
 
     try:
-        client.add_llm_layer(LLMLayer(llm_name=llm_name, llm_backend=llm_backend)) \
-              .add_storage_layer(StorageLayer(root_dir=root_dir)) \
-              .add_memory_layer(MemoryLayer(memory_limit=memory_limit)) \
-              .add_tool_layer(ToolLayer()) \
-              .override_scheduler(OverridesLayer(max_workers=max_workers))
+        client.add_llm_layer(LLMLayer(llm_name=llm_name, llm_backend=llm_backend))
+        client.add_storage_layer(StorageLayer(root_dir=root_dir))
+        client.add_memory_layer(MemoryLayer(memory_limit=memory_limit))
+        client.add_tool_layer(ToolLayer())
+        breakpoint()
+        client.override_scheduler(OverridesLayer(max_workers=max_workers))
         
         status = client.get_status()
         print("✅ Client initialized successfully")

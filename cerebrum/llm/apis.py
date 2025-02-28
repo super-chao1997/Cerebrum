@@ -56,17 +56,20 @@ def llm_chat(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[st
     )
     return send_request(agent_name, query, base_url)
 
-def llm_call_tool(agent_name: str, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
+def llm_call_tool(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
     query = LLMQuery(
+        llms=llms,
         messages=messages,
         tools=tools,
         action_type="tool_use"
     )
     return send_request(agent_name, query, base_url)
 
-def llm_operate_file(agent_name: str, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
+def llm_operate_file(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
     query = LLMQuery(
+        llms=llms,
         messages=messages,
+        tools=tools,
         action_type="operate_file"
     )
     return send_request(agent_name, query, base_url)

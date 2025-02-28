@@ -32,31 +32,13 @@ class TestAgent:
         #     }
         # )
         
-        tools = [
-            {
-                'type': 'function', 
-                'function': {
-                    'name': 'demo_author/arxiv', 
-                    'description': 'Query articles or topics in arxiv', 
-                    'parameters': {
-                        'type': 'object', 
-                        'properties': {
-                            'query': {
-                                'type': 'string', 
-                                'description': 'Input query that describes what to search in arxiv'
-                            }
-                        }, 
-                        'required': ['query']
-                    }
-                }
-            }
-        ]
-        
         tool_response = llm_call_tool(
             agent_name=self.agent_name,
             messages=self.messages,
             base_url="http://localhost:8000",
-            tools=tools
+            llms=[
+                {"name": "qwen2.5:7b", "backend": "ollama"}
+            ]
         )
         
         print(tool_response)

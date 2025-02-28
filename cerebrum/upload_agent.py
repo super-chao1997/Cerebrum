@@ -8,9 +8,14 @@ if __name__ == "__main__":
         "--agent_path",
         required=True
     )
+    parser.add_argument(
+        "--base_url",
+        # default="https://app.aios.foundation"
+        default="http://localhost:3000"
+    )
     args = parser.parse_args()
 
-    manager = AgentManager('https://app.aios.foundation')
+    manager = AgentManager(args.base_url)
 
     agent_package = manager.package_agent(args.agent_path)
 

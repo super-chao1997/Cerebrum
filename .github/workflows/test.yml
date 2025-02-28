@@ -115,7 +115,7 @@ jobs:
         
         # Run the test
         run-agent-test \
-          --task_input "Tell me what is the core idea of AIOS?" \
+          --task_input "What is the capital of France?" \
           2>&1 | tee agent.log
         
         # Check for error patterns

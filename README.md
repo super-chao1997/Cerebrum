@@ -85,7 +85,7 @@ Either run agents that already exist in the local by passing the path to the age
 ```
 python cerebrum/run_agent.py \
     --mode local \
-    --path <agent_name_or_path> \ # path to the agent directory
+    --agent_path <agent_name_or_path> \ # path to the agent directory
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
@@ -93,7 +93,7 @@ For example, to run the test_agent in the local directory, you can run:
 ```
 python cerebrum/run_agent.py \
     --mode local \
-    --path cerebrum/example/agents/test_agent \
+    --agent_path cerebrum/example/agents/test_agent \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 ```

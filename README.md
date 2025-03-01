@@ -81,7 +81,9 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    📝 See [here](https://docs.aios.foundation/getting-started/installation).
 
 2. **Run agents**
+
 Either run agents that already exist in the local by passing the path to the agent directory
+
 ```
 python cerebrum/run_agent.py \
     --mode local \
@@ -89,7 +91,9 @@ python cerebrum/run_agent.py \
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
+
 For example, to run the test_agent in the local directory, you can run:
+
 ```
 python cerebrum/run_agent.py \
     --mode local \
@@ -97,7 +101,9 @@ python cerebrum/run_agent.py \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 ```
+
 Or run agents that are uploaded to agenthub by passing the author and agent name
+
 ```
 python cerebrum/run_agent.py \
     --mode remote \
@@ -106,7 +112,9 @@ python cerebrum/run_agent.py \
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
+
 For example, to run the test_agent in the agenthub, you can run:
+
 ```
 python cerebrum/run_agent.py \
     --mode remote \
@@ -114,6 +122,7 @@ python cerebrum/run_agent.py \
     --agent_name test_agent \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
+```
 
 ## 🚀 Develop and customize new agents
 
@@ -210,6 +219,7 @@ python cerebrum/upload_agent.py \
 ## 🔧Develop and Customize New Tools
 ### Tool Structure
 Similar as developing new agents, developing tools also need to follow a simple directory structure:
+
 ```
 demo_author/
 └── demo_tool/

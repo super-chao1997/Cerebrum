@@ -80,99 +80,40 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 1. **Start the AIOS Kernel** 
    📝 See [here](https://docs.aios.foundation/getting-started/installation).
 
-2. **Run the AIOS Client**
-
-   Run an agent using the client
-   ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <agent name or agent path> --task <task that agent needs to complete>
-   ```
-   For the agent_name_or_path argument, you can either pass the agent names (in the format of author_name/agent_name) that are available on the [agenthub](https://app.aios.foundation/agenthub), or pass the absolute path for the agent folder in your computer. 
-
-   For example, you can run a demo agent avaiable on the agenthub using the following command:  
-   ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path demo_author/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url http://localhost:8000
-   ```
-   or you can run the demo agent by passing the absolute path of the agent folder in your computer
-   ```bash
-   run-agent --llm_name gpt-4o-mini --llm_backend openai --agent_name_or_path <your_local_folder_of_cerebrum>/cerebrum/example/agents/demo_agent --task "Tell me what is core idea of AIOS" --aios_kernel_url "http://localhost:8000"
-   ```
-
-   Code file is located at `cerebrum/example/run_agent.py`
-
-## 👤 Getting Started with Your Client
-
-Let's walk through how to set up and customize your client to work with the AIOS kernel. We'll break this down into simple steps.
-
-### Step 1: Initialize Your Client
-First, let's create your client instance:
-```python
-from cerebrum import config
-from cerebrum.client import Cerebrum
-
-aios_kernel_url = "http://localhost:8000"
-
-client = Cerebrum(base_url = aios_kernel_url)
-config.global_client = client
+2. **Run agents**
+Either run agents that already exist in the local by passing the path to the agent directory
 ```
-
-### Step 2: Add Functionality Layers
-The AIOS kernel offers five core modules you can customize:
-- LLM (Language Model)
-- Memory
-- Storage
-- Tools
-- Scheduler
-
-Here's how to add these layers to your client:
-```python
-from cerebrum.llm.layer import LLMLayer
-from cerebrum.memory.layer import MemoryLayer
-from cerebrum.overrides.layer import OverridesLayer
-from cerebrum.storage.layer import StorageLayer
-from cerebrum.tool.layer import ToolLayer
-
-client.add_llm_layer(
-    LLMLayer(llm_name="gpt-4o-mini", llm_backend="openai")  # Configure your LLM
-).add_storage_layer(
-    StorageLayer(root_dir="root")  # Set storage directory
-).add_memory_layer(
-    MemoryLayer(memory_limit=104857600)  # Set memory per agent
-).add_tool_layer(
-    ToolLayer()  # Add tool capabilities
-).override_scheduler(
-    OverridesLayer(max_workers=32)  # Configure scheduling
-)
+python cerebrum/run_agent.py \
+    --mode local \
+    --agent_path <agent_name_or_path> \ # path to the agent directory
+    --task <task_input> \
+    --agenthub_url <agenthub_url>
 ```
-
-### Step 3: Run Your Agent
-Now you can run agents and get their results:
-```python
-try:
-    # Connect to the client
-    client.connect()
-    
-    # Execute your agent
-    agent_path = "demo_author/demo_agent"  # Your agent's name or path
-    task = "Tell me what is core idea of AIOS"       # Your task description
-    result = client.execute(agent_path, {"task": task})
-    
-    # Get the results
-    final_result = client.poll_agent(
-        result["execution_id"],
-        timeout=300
-    )
-    print("📋 Task result:", final_result)
-    print("✅ Task completed")
-
-except TimeoutError:
-    print("❌ Task timed out")
-except Exception as e:
-    print(f"❌ Failed to execute task: {str(e)}")
-finally:
-    client.cleanup()
+For example, to run the test_agent in the local directory, you can run:
 ```
-
-You can find all these agents in the [example agents folder](./cerebrum/example/agents/). If you would like to customize and develop your new agents, you can check out the guides on [Developing New Agents](#-develop-and-customize-new-agents) and [Developing New Tools](#develop-and-customize-new-tools).
+python cerebrum/run_agent.py \
+    --mode local \
+    --agent_path cerebrum/example/agents/test_agent \
+    --task "What is the capital of United States?" \
+    --agenthub_url https://app.aios.foundation
+```
+Or run agents that are uploaded to agenthub by passing the author and agent name
+```
+python cerebrum/run_agent.py \
+    --mode remote \
+    --agent_author <author> \
+    --agent_name <agent_name> \
+    --task <task_input> \
+    --agenthub_url <agenthub_url>
+```
+For example, to run the test_agent in the agenthub, you can run:
+```
+python cerebrum/run_agent.py \
+    --mode remote \
+    --agent_author example \
+    --agent_name test_agent \
+    --task "What is the capital of United States?" \
+    --agenthub_url https://app.aios.foundation
 
 ## 🚀 Develop and customize new agents
 
@@ -251,212 +192,19 @@ To use these tools in your agent, simply include their reference (from the "How 
 
 If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
 
-### Build Agent
+### APIs to build your agents
+- [LLM APIs](./cerebrum/llm/api.py)
+- [Memory APIs](./cerebrum/memory/api.py)
+- [Storage APIs](./cerebrum/storage/api.py)
+- [Tool APIs](./cerebrum/tool/api.py)
 
-Let's walk through creating your agent's core functionality.
-
-#### Set up the Base Agent Class
-
-First, create your agent class by inheriting from BaseAgent:
-
-```python
-from cerebrum.agents.base import BaseAgent
-from cerebrum.llm.communication import LLMQuery
-import json
-
-class DemoAgent(BaseAgent):
-    def __init__(self, agent_name, task_input, config_):
-        super().__init__(agent_name, task_input, config_)
-
-        self.plan_max_fail_times = 3
-        self.tool_call_max_fail_times = 3
-
-        self.start_time = None
-        self.end_time = None
-        self.request_waiting_times: list = []
-        self.request_turnaround_times: list = []
-        self.task_input = task_input
-        self.messages = []
-        self.workflow_mode = "manual"  # (manual, automatic)
-        self.rounds = 0
-```
-
-#### Import Query Functions
-
-AIOS provides several `Query` classes for different types of interactions and use the `Response` class in [here](./cerebrum/llm/communication.py) to receive results from the AIOS kernel. 
-
-| Query Class | Arguments | Output |
-|:--|:--|:--|
-| `LLMQuery` | messages: `List`, tools: `List`, action_type: `str`, message_return_type: `str` | response: `Response` |
-| `MemoryQuery` | TBD | response: `Response` |
-| `StorageQuery` | TBD | response: `Response` |
-| `ToolQuery` | tool_calls: `List` | response: `Response` |
-
-Here's how to import a specific query
-```python
-from cerebrum.llm.communication import LLMQuery  # Using LLMQuery as an example
-```
-
-#### Construct system instructions
-
-Here's how to set up your agent's system instructions and you need to put this function inside your agent class
+### How to upload your agents to the agenthub
+Run the following command to upload your agents to the agenthub:
 
 ```python
-def build_system_instruction(self):
-    prefix = "".join(["".join(self.config["description"])])
-
-    plan_instruction = "".join(
-        [
-            f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
-            "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
-            "The plan must follow the json format as below: ",
-            "[",
-            '{"action_type": "action_type_value", "action": "action_value","tool_use": [tool_name1, tool_name2,...]}',
-            '{"action_type": "action_type_value", "action": "action_value", "tool_use": [tool_name1, tool_name2,...]}',
-            "...",
-            "]",
-            "In each step of the planned plan, identify tools to use and recognize no tool is necessary. ",
-            "Followings are some plan examples. ",
-            "[" "[",
-            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
-            '{"action_type": "chat", "action": "write a summarization based on the gathered information. ", "tool_use": []}',
-            "];",
-            "[",
-            '{"action_type": "tool_use", "action": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
-            '{"action_type": "chat", "action": "understand the current methods and propose ideas that can improve ", "tool_use": []}',
-            "]",
-            "]",
-        ]
-    )
-
-    if self.workflow_mode == "manual":
-        self.messages.append({"role": "system", "content": prefix})
-
-    else:
-        assert self.workflow_mode == "automatic"
-        self.messages.append({"role": "system", "content": prefix})
-        self.messages.append({"role": "user", "content": plan_instruction})
-```
-
-#### Create Workflows
-
-You can create a workflow for the agent to execute its task and you need to put this function inside your agent class. 
-
-Manual workflow example:
-```python
-def manual_workflow(self):
-    workflow = [
-        {
-            "action_type": "tool_use",
-            "action": "Search for relevant papers",
-            "tool_use": ["demo_author/arxiv"],
-        },
-        {
-            "action_type": "chat",
-            "action": "Provide responses based on the user's query",
-            "tool_use": [],
-        },
-    ]
-    return workflow
-```
-
-
-#### Implement the Run Method
-
-Finally, implement the run method to execute your agent's workflow and you need to put this function inside your agent class. 
-
-```python
-def run(self):
-    self.build_system_instruction()
-
-    task_input = self.task_input
-
-    self.messages.append({"role": "user", "content": task_input})
-
-    workflow = None
-
-    if self.workflow_mode == "automatic":
-        workflow = self.automatic_workflow()
-        self.messages = self.messages[:1]  # clear long context
-
-    else:
-        assert self.workflow_mode == "manual"
-        workflow = self.manual_workflow()
-
-    self.messages.append(
-        {
-            "role": "user",
-            "content": f"[Thinking]: The workflow generated for the problem is {json.dumps(workflow)}. Follow the workflow to solve the problem step by step. ",
-        }
-    )
-
-    try:
-        if workflow:
-            final_result = ""
-
-            for i, step in enumerate(workflow):
-                action_type = step["action_type"]
-                action = step["action"]
-                tool_use = step["tool_use"]
-
-                prompt = f"At step {i + 1}, you need to: {action}. "
-                self.messages.append({"role": "user", "content": prompt})
-
-                if tool_use:
-                    selected_tools = self.pre_select_tools(tool_use)
-
-                else:
-                    selected_tools = None
-
-                response = self.send_request(
-                    agent_name=self.agent_name,
-                    query=LLMQuery(
-                        messages=self.messages,
-                        tools=selected_tools,
-                        action_type=action_type,
-                    ),
-                )["response"]
-                
-                self.messages.append({"role": "assistant", "content": response.response_message})
-
-                self.rounds += 1
-
-
-            final_result = self.messages[-1]["content"]
-            
-            return {
-                "agent_name": self.agent_name,
-                "result": final_result,
-                "rounds": self.rounds,
-            }
-
-        else:
-            return {
-                "agent_name": self.agent_name,
-                "result": "Failed to generate a valid workflow in the given times.",
-                "rounds": self.rounds,
-            }
-            
-    except Exception as e:
-        return {}
-```
-
-### Run the Agent
-To test your agent, use the run_agent command to run:
-
-```bash
-run-agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <agent_name_or_path> --task <task_input> --aios_kernel_url <aios_kernel_url>
-```
-Replace the placeholders with your specific values:
-- `<llm_name>`: The name of the language model you want to use
-- `<llm_backend>`: The backend service for the language model
-- `<your_agent_folder_path>`: The path to your agent's folder
-- `<task_input>`: The task you want your agent to complete
-- `<aios_kernel_url>`: The url that is connected to the aios kernel
-
-or you can run the agent using the source code in the cerebrum/example/run_agent
-```bash
-python cerebrum/example/run_agent --llm_name <llm_name> --llm_backend <llm_backend> --agent_name_or_path <agent_name_or_path>> --task <task_input> --aios_kernel_url <aios_kernel_url>
+python cerebrum/upload_agent.py \
+    --agent_path <agent_path> \ # agent path to the agent directory
+    --agenthub_url <agenthub_url> # the url of the agenthub, default is https://app.aios.foundation
 ```
 
 ## 🔧Develop and Customize New Tools

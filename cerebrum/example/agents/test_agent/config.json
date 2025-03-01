@@ -1,19 +1,16 @@
 {
-    "name": "academic_agent",
+    "name": "test_agent",
     "description": [
-        "You are an academic research assistant. ",
-        "Help users find relevant research papers, summarize key findings, and generate potential research questions."
+        "Agent used for testing."
     ],
-    "tools": [
-        "example/arxiv"
-    ],
+    "tools": [],
     "meta": {
         "author": "example",
-        "version": "1.1.2",
+        "version": "0.0.1",
         "license": "CC0"
     },
     "build": {
         "entry": "agent.py",
-        "module": "AcademicAgent"
+        "module": "TestAgent"
     }
 }

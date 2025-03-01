@@ -10,7 +10,7 @@ license = {file = "LICENSE"}
 name = "aios-agent-sdk"
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
-version = "0.0.2"
+version = "0.0.3"
 
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -41,8 +41,9 @@ exclude = [
 files = ["requirements.txt"]
 
 [project.scripts]
-run-agent = "cerebrum.example.run_agent:main"
-run-agent-test = "cerebrum.example.agents.test_agent.agent:main"
+run-agent = "cerebrum.run_agent:main"
+download-agent = "cerebrum.download_agent:main"
+upload-agent = "cerebrum.upload_agent:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

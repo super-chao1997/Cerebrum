@@ -14,6 +14,8 @@ import traceback
 import logging
 import re
 
+import hashlib
+
 from cerebrum.manager.package import AgentPackage
 from cerebrum.utils.manager import get_newest_version
 
@@ -35,6 +37,7 @@ class AgentManager:
 
     def package_agent(self, folder_path: str) -> Dict:
         try:
+            
             logger.debug(f"\n{'='*50}")
             logger.debug(f"Packaging agent from folder: {folder_path}")
             logger.debug(f"Folder exists: {os.path.exists(folder_path)}")
@@ -135,7 +138,10 @@ class AgentManager:
             f"Agent {author}/{name} (v{actual_version}) downloaded and cached successfully.")
 
         if not self.check_reqs_installed(cache_path):
+            print(f"Installing dependencies for agent {author}/{name} (v{actual_version})")
             self.install_agent_reqs(cache_path)
+            
+        print(f"Dependencies installed for agent {author}/{name} (v{actual_version}) successfully.")
 
         return author, name, actual_version
 
@@ -166,6 +172,9 @@ class AgentManager:
         os.makedirs(random_folder_path, exist_ok=True)
         
         return Path(random_folder_path) / f"local.agent"
+    
+    def _get_hashcoded_cache_path(self, path: str) -> Path:
+        return self.cache_dir / hashlib.sha256(path.encode('utf-8')).hexdigest() / f"local.agent"
 
 
     def _save_agent_to_cache(self, agent_data: Dict, cache_path: Path):
@@ -398,12 +407,14 @@ class AgentManager:
                 local_agent_data = self.package_agent(path)
                 logger.debug(f"Local agent data: {json.dumps(local_agent_data, indent=2)}")
                 
-                random_path = self._get_random_cache_path()
-                logger.debug(f"Generated cache path: {random_path}")
+                # random_path = self._get_random_cache_path()
+                # cache_path = self._get_cache_path(author, name, version)
+                # logger.debug(f"Generated cache path: {random_path}")
                 
-                self._save_agent_to_cache(local_agent_data, random_path)
-                agent_path = f"{random_path}"
-                logger.debug(f"Saved agent to cache: {agent_path}")
+                agent_path = self._get_hashcoded_cache_path(path)
+                
+                self._save_agent_to_cache(local_agent_data, agent_path)
+                # logger.debug(f"Saved agent to cache: {agent_path}")
                 
             elif self.is_builtin_agent(name):
                 # Handle built-in agent

@@ -6,65 +6,28 @@ class TestAgent:
         self.agent_name = agent_name
         self.messages = []
 
-    def manual_workflow(self):
-        workflow = [
-            {
-                "action_type": "tool_use",
-                "action": "Search for relevant papers",
-                "tool_use": ["demo_author/arxiv"],
-            },
-            {
-                "action_type": "chat",
-                "action": "Provide responses based on the user's query",
-                "tool_use": [],
-            },
-        ]
-        return workflow
-
     def run(self, task_input):
-        # workflow = self.manual_workflow()
         self.messages.append({"role": "user", "content": task_input})
-
-        # self.messages.append(
-        #     {
-        #         "role": "user",
-        #         "content": f"[Thinking]: The workflow generated for the problem is {json.dumps(workflow)}. Follow the workflow to solve the problem step by step. ",
-        #     }
-        # )
         
-        tools = [
-            {
-                'type': 'function', 
-                'function': {
-                    'name': 'demo_author/arxiv', 
-                    'description': 'Query articles or topics in arxiv', 
-                    'parameters': {
-                        'type': 'object', 
-                        'properties': {
-                            'query': {
-                                'type': 'string', 
-                                'description': 'Input query that describes what to search in arxiv'
-                            }
-                        }, 
-                        'required': ['query']
-                    }
-                }
-            }
-        ]
-        
-        tool_response = llm_call_tool(
+        tool_response = llm_chat(
             agent_name=self.agent_name,
             messages=self.messages,
             base_url="http://localhost:8000",
-            tools=tools
+            llms=[
+                {"name": "qwen2.5:7b", "backend": "ollama"}
+            ]
         )
         
-        print(tool_response)
-        return tool_response
+        final_result = tool_response["response"]["response_message"]
+        return final_result
         
 def main():
-    agent = TestAgent("demo_agent")
-    agent.run("Tell me what is the core idea of AIOS? ")
+    parser = argparse.ArgumentParser(description="Run test agent")
+    parser.add_argument("--task_input", type=str, required=True, help="Task input for the agent")
+    args = parser.parse_args()
+
+    agent = TestAgent("test_agent")
+    agent.run(args.task_input)
 
 if __name__ == "__main__":
     main()

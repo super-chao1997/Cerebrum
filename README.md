@@ -101,8 +101,8 @@ Or run agents that are uploaded to agenthub by passing the author and agent name
 ```
 python cerebrum/run_agent.py \
     --mode remote \
-    --author <author> \
-    --name <agent_name> \
+    --agent_author <author> \
+    --agent_name <agent_name> \
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
@@ -110,8 +110,8 @@ For example, to run the test_agent in the agenthub, you can run:
 ```
 python cerebrum/run_agent.py \
     --mode remote \
-    --author demo_author \
-    --name test_agent \
+    --agent_author example \
+    --agent_name test_agent \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 
@@ -203,7 +203,7 @@ Run the following command to upload your agents to the agenthub:
 
 ```python
 python cerebrum/upload_agent.py \
-    --path <agent_path> \ # path to the agent directory
+    --agent_path <agent_path> \ # agent path to the agent directory
     --agenthub_url <agenthub_url> # the url of the agenthub, default is https://app.aios.foundation
 ```
 

@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def run_agent():
+def main():
     parser = argparse.ArgumentParser(description="Run agent")
     
     group = parser.add_mutually_exclusive_group(required=True)
@@ -116,4 +116,4 @@ def run_agent():
         sys.exit(1)
 
 if __name__ == "__main__":
-    run_agent()
+    main()

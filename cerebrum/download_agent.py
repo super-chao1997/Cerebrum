@@ -13,13 +13,13 @@ if __name__ == "__main__":
         required=True
     )
     parser.add_argument(
-        "--base_url",
+        "--agenthub_url",
         # default="https://app.aios.foundation"
         default="http://localhost:3000"
     )
     args = parser.parse_args()
 
-    manager = AgentManager(args.base_url)
+    manager = AgentManager(args.agenthub_url)
 
     agent = manager.download_agent(args.author, args.name)
     print(agent)

@@ -13,11 +13,11 @@ def run_agent():
     parser = argparse.ArgumentParser(description="Run agent")
     
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--path", help="Local path to the agent directory")
-    group.add_argument("--author", help="Author of the remote agent")
+    group.add_argument("--agent_path", help="Local path to the agent directory")
+    group.add_argument("--agent_author", help="Author of the remote agent")
     
-    parser.add_argument("--name", help="Name of the remote agent (required if --author is provided)")
-    parser.add_argument("--version", help="Specific version of the agent to run (optional)")
+    parser.add_argument("--agent_name", help="Name of the remote agent (required if --agent_author is provided)")
+    parser.add_argument("--agent_version", help="Specific version of the agent to run (optional)")
     parser.add_argument("--agenthub_url", default="https://app.aios.foundation", 
                         help="Base URL for the Cerebrum API (default: https://app.aios.foundation)")
     parser.add_argument("--task_input", help="Task input for the agent", default="")
@@ -28,14 +28,14 @@ def run_agent():
     
     args = parser.parse_args()
     
-    if args.author and not args.name:
-        parser.error("--name is required when --author is provided")
+    if args.agent_author and not args.agent_name:
+        parser.error("--agent_name is required when --agent_author is provided")
     
-    if args.path and args.mode == "remote":
-        parser.error("Cannot use --mode=remote with --path (use --author and --name instead)")
+    if args.agent_path and args.mode == "remote":
+        parser.error("Cannot use --mode=remote with --agent_path (use --agent_author and --agent_name instead)")
     
-    if args.author and args.mode == "local":
-        parser.error("Cannot use --mode=local with --author (use --path instead)")
+    if args.agent_author and args.mode == "local":
+        parser.error("Cannot use --mode=local with --agent_author (use --agent_path instead)")
     
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -57,33 +57,33 @@ def run_agent():
         # Determine loading mode
         load_mode = args.mode
         if not load_mode:
-            load_mode = "local" if args.path else "remote"
+            load_mode = "local" if args.agent_path else "remote"
         
         logger.info(f"Agent loading mode: {load_mode}")
         
         if load_mode == "local":
-            logger.info(f"Running agent from local path: {args.path}")
+            logger.info(f"Running agent from local path: {args.agent_path}")
             
-            if not os.path.exists(args.path):
-                logger.error(f"Path does not exist: {args.path}")
+            if not os.path.exists(args.agent_path):
+                logger.error(f"Path does not exist: {args.agent_path}")
                 sys.exit(1)
             
-            agent_class, agent_config = manager.load_agent(local=True, path=args.path)
+            agent_class, agent_config = manager.load_agent(local=True, path=args.agent_path)
             logger.info(f"Loaded local agent: {agent_config.get('name', 'unknown')}")
             
         else:  # remote mode
-            logger.info(f"Running remote agent: {args.author}/{args.name}")
+            logger.info(f"Running remote agent: {args.agent_author}/{args.agent_name}")
             
             try:
-                cached_versions = manager._get_cached_versions(args.author, args.name)
-                version_to_use = args.version or (manager.get_newest_version(cached_versions) if cached_versions else None)
+                cached_versions = manager._get_cached_versions(args.agent_author, args.agent_name)
+                version_to_use = args.agent_version or (manager.get_newest_version(cached_versions) if cached_versions else None)
                 
                 if version_to_use and version_to_use in cached_versions:
                     logger.info(f"Using cached version: {version_to_use}")
                 else:
-                    logger.info(f"Downloading agent {args.author}/{args.name}" + 
-                                (f" (version {args.version})" if args.version else ""))
-                    author, name, version = manager.download_agent(args.author, args.name, args.version)
+                    logger.info(f"Downloading agent {args.agent_author}/{args.agent_name}" + 
+                                (f" (version {args.agent_version})" if args.agent_version else ""))
+                    author, name, version = manager.download_agent(args.agent_author, args.agent_name, args.agent_version)
                     version_to_use = version
                     logger.info(f"Downloaded agent version: {version_to_use}")
             except Exception as e:
@@ -91,11 +91,11 @@ def run_agent():
                 sys.exit(1)
             
             agent_class, agent_config = manager.load_agent(
-                author=args.author, 
-                name=args.name, 
+                author=args.agent_author, 
+                name=args.agent_name, 
                 version=version_to_use
             )
-            logger.info(f"Loaded remote agent: {args.author}/{args.name} (v{version_to_use})")
+            logger.info(f"Loaded remote agent: {args.agent_author}/{args.agent_name} (v{version_to_use})")
         
         merged_config = {**agent_config, **config}
         

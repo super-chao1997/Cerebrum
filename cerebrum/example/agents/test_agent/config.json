@@ -3,9 +3,7 @@
     "description": [
         "Agent used for testing."
     ],
-    "tools": [
-        "example/arxiv"
-    ],
+    "tools": [],
     "meta": {
         "author": "example",
         "version": "0.0.1",

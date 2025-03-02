@@ -1,11 +1,11 @@
-from cerebrum.agents.base import BaseAgent
-from cerebrum.llm.communication import LLMQuery
+from cerebrum.llm.apis import llm_chat, llm_call_tool
+from cerebrum.interface import AutoTool
+import os
 import json
 
-class AcademicAgent(BaseAgent):
-    def __init__(self, agent_name, task_input, config_):
-        super().__init__(agent_name, task_input, config_)
-
+class AcademicAgent:
+    def __init__(self, agent_name):
+        self.agent_name = agent_name
         self.plan_max_fail_times = 3
         self.tool_call_max_fail_times = 3
 
@@ -13,11 +13,30 @@ class AcademicAgent(BaseAgent):
         self.end_time = None
         self.request_waiting_times: list = []
         self.request_turnaround_times: list = []
-        self.task_input = task_input
         self.messages = []
         self.workflow_mode = "manual"  # (manual, automatic)
         self.rounds = 0
 
+        self.config = self._load_config()
+        self.tools, self.tool_info = AutoTool.from_batch_preload(self.config["tools"]).values()
+
+    def _load_config(self):
+        script_path = os.path.abspath(__file__)
+        script_dir = os.path.dirname(script_path)
+        config_file = os.path.join(script_dir, "config.json")
+
+        with open(config_file, "r") as f:
+            config = json.load(f)
+            return config
+        
+    def pre_select_tools(self, tool_names):
+        pre_selected_tools = []
+        for tool_name in tool_names:
+            for tool in self.tools:
+                if tool["function"]["name"] == tool_name:
+                    pre_selected_tools.append(tool)
+                    break
+        return pre_selected_tools
 
     def build_system_instruction(self):
         prefix = "".join(["".join(self.config["description"])])
@@ -56,11 +75,10 @@ class AcademicAgent(BaseAgent):
 
     def automatic_workflow(self):
         for i in range(self.plan_max_fail_times):
-            response = self.send_request(
-                agent_name=self.agent_name,
-                query=LLMQuery(
-                    messages=self.messages, tools=None, message_return_type="json"
-                ),
+            response = llm_chat(
+                messages=self.messages,
+                tools=None,
+                message_return_type="json"
             )["response"]
 
             workflow = self.check_workflow(response.response_message)
@@ -94,10 +112,8 @@ class AcademicAgent(BaseAgent):
         ]
         return workflow
 
-    def run(self):
+    def run(self, task_input):
         self.build_system_instruction()
-
-        task_input = self.task_input
 
         self.messages.append({"role": "user", "content": task_input})
 
@@ -136,16 +152,22 @@ class AcademicAgent(BaseAgent):
                     else:
                         selected_tools = None
 
-                    response = self.send_request(
-                        agent_name=self.agent_name,
-                        query=LLMQuery(
+                    if action_type == "tool_use":
+                        response = llm_call_tool(
+                            agent_name=self.agent_name,
                             messages=self.messages,
                             tools=selected_tools,
-                            action_type=action_type,
-                        ),
-                    )["response"]
-                    
-                    self.messages.append({"role": "assistant", "content": response.response_message})
+                            base_url="http://localhost:8000",
+                        )["response"]
+
+                    elif action_type == "chat":
+                        response = llm_chat(
+                            agent_name=self.agent_name,
+                            messages=self.messages,
+                            base_url="http://localhost:8000",
+                        )["response"]
+
+                    self.messages.append({"role": "assistant", "content": response["response_message"]})
 
                     self.rounds += 1
 

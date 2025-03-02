@@ -1,15 +1,17 @@
-from cerebrum.agents.base import BaseAgent
-from cerebrum.llm.communication import LLMQuery
+from cerebrum.llm.apis import llm_chat, llm_call_tool
+from cerebrum.interface import AutoTool
 import json
 import traceback
 import logging
 import datetime
+import os
+class MathAgent:
+    def __init__(self, agent_name):
+        self.agent_name = agent_name
+        self.config = self.load_config()
+        self.tools, self.tool_info = AutoTool.from_batch_preload(self.config["tools"]).values()
 
-class MathAgent(BaseAgent):
-    def __init__(self, agent_name, task_input, config_):
         try:
-            super().__init__(agent_name, task_input, config_)
-
             self.plan_max_fail_times = 3
             self.tool_call_max_fail_times = 3
 
@@ -17,31 +19,47 @@ class MathAgent(BaseAgent):
             self.end_time = None
             self.request_waiting_times: list = []
             self.request_turnaround_times: list = []
-            self.task_input = task_input
             self.messages = []
             self.workflow_mode = "manual"  # (manual, automatic)
             self.rounds = 0
-            self.status = "initialized"  # 添加状态跟踪
-            self.debug_logs = []  # 用于收集调试信息
-            self._log_debug(f"MathAgent initialized with name: {agent_name}, task: {task_input}")
+            self.status = "initialized"
+            self.debug_logs = []
+            self._log_debug(f"MathAgent initialized with name: {agent_name}")
             self._log_debug(f"Initial status: {self.status}")
+            
         except Exception as e:
             print(f"[ERROR] Failed to initialize MathAgent: {str(e)}")
             print(traceback.format_exc())
             raise
+        
+    def load_config(self):
+        script_path = os.path.abspath(__file__)
+        script_dir = os.path.dirname(script_path)
+        config_file = os.path.join(script_dir, "config.json")
 
+        with open(config_file, "r") as f:
+            config = json.load(f)
+        return config
+
+    def pre_select_tools(self, tool_names):
+        pre_selected_tools = []
+        for tool_name in tool_names:
+            for tool in self.tools:
+                if tool["function"]["name"] == tool_name:
+                    pre_selected_tools.append(tool)
+                    break
+        return pre_selected_tools
+    
     def _log_debug(self, message: str):
-        """记录调试信息到实例变量"""
         log_entry = {
             "type": "debug",
             "message": message,
             "timestamp": datetime.datetime.now().isoformat()
         }
-        print(f"[DEBUG] {message}")  # 立即打印到控制台
+        print(f"[DEBUG] {message}")
         self.debug_logs.append(log_entry)
 
     def _log_error(self, message: str, error: Exception = None):
-        """记录错误信息到实例变量"""
         error_info = {
             "type": "error",
             "message": message,
@@ -50,28 +68,26 @@ class MathAgent(BaseAgent):
         if error:
             error_info["error"] = str(error)
             error_info["traceback"] = traceback.format_exc()
-        print(f"[ERROR] {message}")  # 立即打印到控制台
+        print(f"[ERROR] {message}")
         if error:
             print(f"[ERROR] Exception: {str(error)}")
             print(f"[ERROR] Traceback:\n{traceback.format_exc()}")
         self.debug_logs.append(error_info)
 
     def _update_status(self, new_status: str):
-        """Helper method to update and log status changes"""
         old_status = self.status
         self.status = new_status
         message = f"Status changed: {old_status} -> {new_status}"
         self._log_debug(message)
 
     def get_status(self):
-        """返回当前agent的状态信息"""
         try:
             status_info = {
                 "agent_name": self.agent_name,
                 "status": self.status,
                 "rounds": self.rounds,
                 "workflow_mode": self.workflow_mode,
-                "debug_logs": self.debug_logs,  # 包含调试日志
+                "debug_logs": self.debug_logs,
                 "timestamp": datetime.datetime.now().isoformat()
             }
             self._log_debug("Status requested")
@@ -89,10 +105,10 @@ class MathAgent(BaseAgent):
             }
             return error_info
 
-    def run(self):
+    def run(self, task_input):
         try:
             self._update_status("running")
-            self._log_debug(f"Starting run with task: {self.task_input}")
+            self._log_debug(f"Starting run with task: {task_input}")
             
             if not self.build_system_instruction():
                 error_result = {
@@ -104,7 +120,6 @@ class MathAgent(BaseAgent):
                 }
                 return error_result
 
-            task_input = self.task_input
             self.messages.append({"role": "user", "content": task_input})
 
             workflow = None
@@ -150,16 +165,21 @@ class MathAgent(BaseAgent):
                 else:
                     selected_tools = None
 
-                response = self.send_request(
-                    agent_name=self.agent_name,
-                    query=LLMQuery(
+                if action_type == "tool_use":
+                    response = llm_call_tool(
+                        agent_name=self.agent_name,
                         messages=self.messages,
                         tools=selected_tools,
-                        action_type=action_type,
-                    ),
-                )["response"]
+                        base_url="http://localhost:8000"
+                    )["response"]
+                else:
+                    response = llm_chat(
+                        agent_name=self.agent_name,
+                        messages=self.messages,
+                        base_url="http://localhost:8000"
+                    )["response"]
                 
-                self.messages.append({"role": "assistant", "content": response.response_message})
+                self.messages.append({"role": "assistant", "content": response["response_message"]})
                 self.rounds += 1
 
             final_result = self.messages[-1]["content"]

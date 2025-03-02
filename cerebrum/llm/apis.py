@@ -18,7 +18,7 @@ class LLMQuery(Query):
         message_return_type (str): The type of the response message. Default is "text".
     """
     query_class: str = "llm"
-    llms: List[Dict[str, Any]] = Field(default_factory=list)
+    llms: Optional[List[Dict[str, Any]]] = Field(default=None)
     messages: List[Dict[str, Union[str, Any]]]  # List of message dictionaries, each containing role and content.
     tools: Optional[List[Dict[str, Any]]] = Field(default_factory=list)  # List of JSON-like objects (dictionaries) representing tools.
     action_type: Literal["chat", "tool_use", "operate_file"] = Field(default="chat")  # Restrict the action_type to specific choices.
@@ -47,7 +47,7 @@ class LLMResponse(Response):
     class Config:
         arbitrary_types_allowed = True
 
-def llm_chat(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
+def llm_chat(agent_name: str, messages: List[Dict[str, Any]], base_url: str = "http://localhost:8000", llms: List[Dict[str, Any]] = None):
     query = LLMQuery(
         llms=llms,
         messages=messages,
@@ -56,7 +56,7 @@ def llm_chat(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[st
     )
     return send_request(agent_name, query, base_url)
 
-def llm_call_tool(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
+def llm_call_tool(agent_name: str, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000", llms: List[Dict[str, Any]] = None):
     query = LLMQuery(
         llms=llms,
         messages=messages,
@@ -65,7 +65,7 @@ def llm_call_tool(agent_name: str, llms: List[Dict[str, Any]], messages: List[Di
     )
     return send_request(agent_name, query, base_url)
 
-def llm_operate_file(agent_name: str, llms: List[Dict[str, Any]], messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000"):
+def llm_operate_file(agent_name: str, messages: List[Dict[str, Any]], tools: List[Dict[str, Any]], base_url: str = "http://localhost:8000", llms: List[Dict[str, Any]] = None):
     query = LLMQuery(
         llms=llms,
         messages=messages,

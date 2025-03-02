@@ -1,30 +1,31 @@
-from cerebrum.manager.agent import AgentManager
+# from cerebrum.manager.agent import AgentManager
 from cerebrum.manager.tool import ToolManager
-from cerebrum.runtime.process import LLMProcessor, RunnableAgent
-from cerebrum.config.config_manager import config
+# from cerebrum.runtime.process import LLMProcessor, RunnableAgent
+# from cerebrum.config.config_manager import config
 
-from .. import config as cerebrum_config
+# from .. import config as cerebrum_config
  
-class AutoAgent:
-    hub_url = config.get('manager', 'agent_hub_url')
-    print(f"[DEBUG] Using Agent Hub URL: {hub_url}")
-    AGENT_MANAGER = AgentManager(hub_url)
+# class AutoAgent:
+#     hub_url = config.get('manager', 'agent_hub_url')
+#     print(f"[DEBUG] Using Agent Hub URL: {hub_url}")
+#     AGENT_MANAGER = AgentManager(hub_url)
  
-    @classmethod
-    def from_preloaded(cls, agent_name: str):
-        _client = cerebrum_config.global_client
+#     @classmethod
+#     def from_preloaded(cls, agent_name: str):
+#         _client = cerebrum_config.global_client
 
-        return RunnableAgent(_client, agent_name)
+#         return RunnableAgent(_client, agent_name)
 
 
-class AutoLLM:
-    @classmethod
-    def from_dynamic(cls):
-        return LLMProcessor(cerebrum_config.global_client)
+# class AutoLLM:
+#     @classmethod
+#     def from_dynamic(cls):
+#         return LLMProcessor(cerebrum_config.global_client)
 
 
 class AutoTool:
-    hub_url = config.get('manager', 'tool_hub_url')
+    # hub_url = config.get('manager', 'tool_hub_url')
+    hub_url = "https://app.aios.foundation"
     print(f"[DEBUG] Using Tool Hub URL: {hub_url}")
     TOOL_MANAGER = ToolManager(hub_url)
 

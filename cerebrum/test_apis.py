@@ -69,19 +69,19 @@ def test_llm_call_tool(messages):
     ]
     # breakpoint()
     # [bug remind] message should be the input while call_tool doesn't have this attribute.
-    response = call_tool(agent_name="demo_agent", tool_name=tools, base_url="http://localhost:8000")
+    response = call_tool(agent_name="test", tool_name=tools, base_url="http://localhost:8000")
     print(response)
     
 def test_operate_file():
     return NotImplementedError
 
-def test_mount(task):
+def test_sto_retrieve(task):
     query_text, n, keywords = task["query_text"], task["n"], task["keywords"]
     #query_text = "top 3 papers related to KV cache"
     #n = 3
     # keywords = ["KV cache", "cache"]
     #keywords = None
-    response = retrieve(agent_name="demo_agent", query_text=query_text, n=n, keywords=keywords, base_url="http://localhost:8000")
+    response = retrieve(agent_name="test", query_text=query_text, n=n, keywords=keywords, base_url="http://localhost:8000")
     print(response)
 
 def test_create_file():

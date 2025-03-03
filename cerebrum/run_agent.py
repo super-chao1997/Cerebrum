@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from cerebrum.manager.agent import AgentManager
+from cerebrum.utils.manager import get_newest_version
 import argparse
 import os
 import sys
@@ -17,7 +18,7 @@ def main():
     group.add_argument("--agent_author", help="Author of the remote agent")
     
     parser.add_argument("--agent_name", help="Name of the remote agent (required if --agent_author is provided)")
-    parser.add_argument("--agent_version", help="Specific version of the agent to run (optional)")
+    parser.add_argument("--agent_version", help="Version of the agent to run (required for remote mode)")
     parser.add_argument("--agenthub_url", default="https://app.aios.foundation", 
                         help="Base URL for the Cerebrum API (default: https://app.aios.foundation)")
     parser.add_argument("--task_input", help="Task input for the agent", default="")
@@ -59,13 +60,17 @@ def main():
         if not load_mode:
             load_mode = "local" if args.agent_path else "remote"
         
+        # Check required parameters for remote mode
+        if load_mode == "remote" and not args.agent_version:
+            parser.error("--agent_version is required for remote mode")
+        
         logger.info(f"Agent loading mode: {load_mode}")
         
         if load_mode == "local":
             logger.info(f"Running agent from local path: {args.agent_path}")
             
             if not os.path.exists(args.agent_path):
-                logger.error(f"Path does not exist: {args.agent_path}")
+                logger.error(f"Provided agentpath does not exist: {args.agent_path}")
                 sys.exit(1)
             
             agent_class, agent_config = manager.load_agent(local=True, path=args.agent_path)
@@ -75,19 +80,24 @@ def main():
             logger.info(f"Running remote agent: {args.agent_author}/{args.agent_name}")
             
             try:
+                # First check if version exists in cache
                 cached_versions = manager._get_cached_versions(args.agent_author, args.agent_name)
-                version_to_use = args.agent_version or (manager.get_newest_version(cached_versions) if cached_versions else None)
-                
-                if version_to_use and version_to_use in cached_versions:
-                    logger.info(f"Using cached version: {version_to_use}")
+                if args.agent_version in cached_versions:
+                    logger.info(f"Using cached version: {args.agent_version}")
+                    version_to_use = args.agent_version
                 else:
-                    logger.info(f"Downloading agent {args.agent_author}/{args.agent_name}" + 
-                                (f" (version {args.agent_version})" if args.agent_version else ""))
-                    author, name, version = manager.download_agent(args.agent_author, args.agent_name, args.agent_version)
-                    version_to_use = version
-                    logger.info(f"Downloaded agent version: {version_to_use}")
+                    # Try to download the specified version
+                    try:
+                        logger.info(f"Version {args.agent_version} not found in cache, attempting to download...")
+                        author, name, version = manager.download_agent(args.agent_author, args.agent_name, args.agent_version)
+                        version_to_use = version
+                        logger.info(f"Downloaded agent version: {version_to_use}")
+                    except Exception as e:
+                        logger.error(f"Version {args.agent_version} does not exist for agent {args.agent_author}/{args.agent_name}")
+                        sys.exit(1)
+                    
             except Exception as e:
-                logger.error(f"Failed to download agent: {e}")
+                logger.error(f"Failed to check or download agent: {e}")
                 sys.exit(1)
             
             agent_class, agent_config = manager.load_agent(

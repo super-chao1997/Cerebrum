@@ -12,10 +12,7 @@ class TestAgent:
         tool_response = llm_chat(
             agent_name=self.agent_name,
             messages=self.messages,
-            base_url="http://localhost:8000",
-            llms=[
-                {"name": "qwen2.5:7b", "backend": "ollama"}
-            ]
+            base_url="http://localhost:8000"
         )
         
         final_result = tool_response["response"]["response_message"]

@@ -7,8 +7,8 @@ from cerebrum.interface import AutoTool
 
 from typing import List, Dict, Any
 
-def test_single_llm_chat():
-    messages=[{"role": "user", "content": "What is the capital of France?"}]
+def test_single_llm_chat(messages):
+    #messages=[{"role": "user", "content": "What is the capital of France?"}]
     response = llm_chat(
         agent_name="test", 
         messages=messages, 
@@ -19,8 +19,8 @@ def test_single_llm_chat():
     )
     print(response)
 
-def test_multi_llm_chat():
-    messages=[{"role": "user", "content": "What is the capital of France?"}]
+def test_multi_llm_chat(messages):
+    #messages=[{"role": "user", "content": "What is the capital of France?"}]
     response = llm_chat(
         agent_name="test", 
         messages=messages, 
@@ -45,8 +45,8 @@ def test_multi_llm_chat():
     
     print(response)
     
-def test_llm_call_tool():
-    messages=[{"role": "user", "content": "Tell me the core idea of OpenAGI paper"}]
+def test_llm_call_tool(messages):
+    #messages=[{"role": "user", "content": "Tell me the core idea of OpenAGI paper"}]
     # tool = AutoTool.from_preloaded("demo_author/arxiv")
     tools = [
         {
@@ -68,18 +68,20 @@ def test_llm_call_tool():
         }
     ]
     # breakpoint()
-    response = call_tool(agent_name="demo_agent", messages=messages, tools=tools, base_url="http://localhost:8000")
+    # [bug remind] message should be the input while call_tool doesn't have this attribute.
+    response = call_tool(agent_name="test", tool_name=tools, base_url="http://localhost:8000")
     print(response)
     
 def test_operate_file():
     return NotImplementedError
 
-def test_mount():
-    query_text = "top 3 papers related to KV cache"
-    n = 3
+def test_sto_retrieve(task):
+    query_text, n, keywords = task["query_text"], task["n"], task["keywords"]
+    #query_text = "top 3 papers related to KV cache"
+    #n = 3
     # keywords = ["KV cache", "cache"]
-    keywords = None
-    response = retrieve(agent_name="demo_agent", query_text=query_text, n=n, keywords=keywords, base_url="http://localhost:8000")
+    #keywords = None
+    response = retrieve(agent_name="test", query_text=query_text, n=n, keywords=keywords, base_url="http://localhost:8000")
     print(response)
 
 def test_create_file():

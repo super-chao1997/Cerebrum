@@ -109,6 +109,7 @@ python cerebrum/run_agent.py \
     --mode remote \
     --agent_author <author> \
     --agent_name <agent_name> \
+    --agent_version <agent_version> \
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
@@ -120,6 +121,7 @@ python cerebrum/run_agent.py \
     --mode remote \
     --agent_author example \
     --agent_name test_agent \
+    --agent_version 0.0.3 \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 ```

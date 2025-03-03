@@ -71,6 +71,7 @@ python cerebrum/run_agent.py \
   --mode remote \
   --agent_author example \
   --agent_name test_agent \
+  --agent_version 0.0.3 \
   --agenthub_url https://app.aios.foundation \
   --task "Tell me what is the capital of United States"
 

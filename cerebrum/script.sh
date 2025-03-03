@@ -3,6 +3,11 @@
 # Run local agent
 python cerebrum/run_agent.py \
   --mode local \
+  --agent_path cerebrum/example/agents/demo_agent \
+  --task "What is the latest research on the topic of AI and machine learning?"
+
+python cerebrum/run_agent.py \
+  --mode local \
   --agent_path cerebrum/example/agents/test_agent \
   --task "Tell me what is the capital of United States"
 

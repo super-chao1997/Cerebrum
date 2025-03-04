@@ -238,7 +238,7 @@ def main():
     """Main entry point for the script."""
     config = parse_arguments()
     runner = AgentRunner(config)
-    return runner.run()
+    runner.run()
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

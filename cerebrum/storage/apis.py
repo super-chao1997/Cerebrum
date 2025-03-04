@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Union, Optional
 
-from cerebrum.utils.communication import Query, send_request, Response
+from cerebrum.utils.communication import Query, send_request, Response, aios_kernel_url
 
 class StorageQuery(Query):
     """
@@ -73,7 +73,7 @@ class StorageResponse(Response):
 def mount(
         agent_name: str, 
         root_dir: str,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Mount a storage directory for an agent.
@@ -107,7 +107,7 @@ def retrieve(
         query_text: str,
         n: int,
         keywords: List[str] = None,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Retrieve files matching query criteria.
@@ -152,7 +152,7 @@ def retrieve(
 def create_file(
         agent_name: str, 
         file_path: str,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Create a new empty file.
@@ -184,7 +184,7 @@ def create_file(
 def create_dir(
         agent_name: str, 
         dir_path: str,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Create a new directory.
@@ -217,7 +217,7 @@ def write_file(
         agent_name: str, 
         file_path: str,
         content: str,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Write content to a file.
@@ -253,7 +253,7 @@ def roll_back(
         agent_name: str, 
         file_path: str,
         n: int,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Roll back a file to a previous version.
@@ -286,7 +286,7 @@ def roll_back(
 def share_file(
         agent_name: str, 
         file_path: str,
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> StorageResponse:
     """
     Share a file with other agents.

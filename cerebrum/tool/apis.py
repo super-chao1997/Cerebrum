@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any, Union, Optional
-from cerebrum.utils.communication import Query, send_request, Response
+from cerebrum.utils.communication import Query, send_request, Response, aios_kernel_url
 
 class ToolQuery(Query):
     """
@@ -108,7 +108,7 @@ class ToolResponse(Response):
 def call_tool(
         agent_name: str, 
         tool_calls: List[Dict[str, Any]],
-        base_url: str = "http://localhost:8000"
+        base_url: str = aios_kernel_url
     ) -> ToolResponse:
     """
     Execute one or more tool calls.

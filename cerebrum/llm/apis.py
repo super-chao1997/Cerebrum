@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any, Union
 from typing_extensions import Literal
 
-from cerebrum.utils.communication import Query, Response, send_request
+from cerebrum.utils.communication import Query, Response, send_request, aios_kernel_url
 
 class LLMQuery(Query):
     """
@@ -175,7 +175,7 @@ class LLMResponse(Response):
 def llm_chat(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
-        base_url: str = "http://localhost:8000",
+        base_url: str = aios_kernel_url,
         llms: List[Dict[str, Any]] = None
     ) -> LLMResponse:
     """
@@ -230,7 +230,7 @@ def llm_call_tool(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
         tools: List[Dict[str, Any]], 
-        base_url: str = "http://localhost:8000",
+        base_url: str = aios_kernel_url,
         llms: List[Dict[str, Any]] = None
     ) -> LLMResponse:
     """
@@ -354,7 +354,7 @@ def llm_operate_file(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
         tools: List[Dict[str, Any]], 
-        base_url: str = "http://localhost:8000",
+        base_url: str = aios_kernel_url,
         llms: List[Dict[str, Any]] = None
     ) -> LLMResponse:
     """

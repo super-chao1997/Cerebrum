@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any, Union
 from typing_extensions import Literal
 
-from cerebrum.utils.communication import Query, Response, send_request
+from cerebrum.utils.communication import Query, Response, send_request, aios_kernel_url
 
 class MemoryQuery(Query):
     """
@@ -47,7 +47,7 @@ class MemoryResponse(Response):
 def create_memory(agent_name: str, 
                  content: str, 
                  metadata: Optional[Dict[str, Any]] = None,
-                 base_url: str = "http://localhost:8000") -> MemoryResponse:
+                 base_url: str = aios_kernel_url) -> MemoryResponse:
     """Create a new memory note.
     
     Args:
@@ -74,7 +74,7 @@ def create_memory(agent_name: str,
 
 def read_memory(agent_name: str, 
                 memory_id: str,
-                base_url: str = "http://localhost:8000") -> MemoryResponse:
+                base_url: str = aios_kernel_url) -> MemoryResponse:
     """Read a memory note by ID.
     
     Args:
@@ -101,7 +101,7 @@ def update_memory(agent_name: str,
                  memory_id: str,
                  content: Optional[str] = None,
                  metadata: Optional[Dict[str, Any]] = None,
-                 base_url: str = "http://localhost:8000") -> MemoryResponse:
+                 base_url: str = aios_kernel_url) -> MemoryResponse:
     """Update an existing memory note.
     
     Args:
@@ -139,7 +139,7 @@ def update_memory(agent_name: str,
 
 def delete_memory(agent_name: str,
                  memory_id: str,
-                 base_url: str = "http://localhost:8000") -> MemoryResponse:
+                 base_url: str = aios_kernel_url) -> MemoryResponse:
     """Delete a memory note.
     
     Args:
@@ -164,7 +164,7 @@ def delete_memory(agent_name: str,
 def search_memories(agent_name: str,
                    query: str,
                    limit: int = 5,
-                   base_url: str = "http://localhost:8000") -> MemoryResponse:
+                   base_url: str = aios_kernel_url) -> MemoryResponse:
     """Search for memories using a hybrid retrieval approach.
     
     Args:

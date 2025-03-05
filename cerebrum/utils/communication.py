@@ -4,6 +4,8 @@ from typing_extensions import Literal
 import requests
 from typing import Dict, Any, List
 
+aios_kernel_url = "http://localhost:8000"
+
 class Query(BaseModel):
     query_class: Literal["llm", "memory", "storage", "tool"]
     
@@ -15,7 +17,7 @@ def post(base_url: str, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
     response.raise_for_status()
     return response.json()
 
-def send_request(agent_name: str, query: Query, base_url: str = "http://localhost:8000"):
+def send_request(agent_name: str, query: Query, base_url: str = aios_kernel_url):
     query_type = query.query_class
     result = post(base_url, "/query", {
         'query_type': query_type,

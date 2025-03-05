@@ -112,7 +112,7 @@ class LLMQuery(Query):
     messages: List[Dict[str, Union[str, Any]]]
     tools: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
     action_type: Literal["chat", "tool_use", "operate_file"] = Field(default="chat")
-    message_return_type: str = Field(default="text")
+    message_return_type: Literal["text", "json"] = Field(default="text")
 
     class Config:
         arbitrary_types_allowed = True
@@ -223,6 +223,61 @@ def llm_chat(
         messages=messages,
         tools=None,
         action_type="chat"
+    )
+    return send_request(agent_name, query, base_url)
+
+def llm_chat_with_json_output(
+        agent_name: str, 
+        messages: List[Dict[str, Any]], 
+        base_url: str = aios_kernel_url,
+        llms: List[Dict[str, Any]] = None
+    ) -> LLMResponse:
+    """
+    Perform a chat interaction with the LLM.
+    
+    Args:
+        agent_name: Name of the agent making the request
+        messages: List of message dictionaries with format:
+            [
+                {
+                    "role": "system"|"user"|"assistant",
+                    "content": str,
+                    "name": str  # Optional
+                }
+            ]
+        base_url: API base URL
+        llms: Optional list of LLM configurations
+        
+    Returns:
+        LLMResponse containing the generated response
+        
+    Examples:
+        ```python
+        response = llm_chat(
+            "agent1",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant."
+                },
+                {
+                    "role": "user",
+                    "content": "Explain quantum computing."
+                }
+            ],
+            llms=[{
+                "name": "gpt-4",
+                "temperature": 0.7
+            }]
+        )
+        ```
+    """
+    query = LLMQuery(
+        llms=llms,
+        messages=messages,
+        tools=None,
+        action_type="chat",
+        message_return_type="json"
     )
     return send_request(agent_name, query, base_url)
 

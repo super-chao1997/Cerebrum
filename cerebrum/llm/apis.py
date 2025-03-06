@@ -16,10 +16,10 @@ class LLMQuery(Query):
         llms: Optional list of LLM configurations with format:
             [
                 {
-                    "name": str,          # Name of the LLM (e.g., "gpt-4")
+                    "name": str,           # Name of the LLM (e.g., "gpt-4")
                     "temperature": float,  # Sampling temperature (0.0-2.0)
                     "max_tokens": int,     # Maximum tokens to generate
-                    "top_p": float,       # Nucleus sampling parameter (0.0-1.0)
+                    "top_p": float,        # Nucleus sampling parameter (0.0-1.0)
                     "frequency_penalty": float,  # Frequency penalty (-2.0-2.0)
                     "presence_penalty": float    # Presence penalty (-2.0-2.0)
                 }
@@ -27,9 +27,9 @@ class LLMQuery(Query):
         messages: List of message dictionaries with format:
             [
                 {
-                    "role": str,     # One of ["system", "user", "assistant"]
-                    "content": str,  # The message content
-                    "name": str,     # Optional name for the message sender
+                    "role": str,      # One of ["system", "user", "assistant"]
+                    "content": str,   # The message content
+                    "name": str,      # Optional name for the message sender
                     "function_call": dict,  # Optional function call details
                     "tool_calls": list     # Optional tool call details
                 }
@@ -54,6 +54,36 @@ class LLMQuery(Query):
             - "tool_use": Using external tools
             - "operate_file": File operations
         message_return_type: Desired format of the response
+        response_format: Specific JSON format of the response, e.g., 
+            {
+                "type": "json_schema", 
+                "json_schema": {
+                    "name": "response",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "keywords": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "context": {
+                                "type": "string"
+                            },
+                            "tags": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "required": ["keywords", "context", "tags"],
+                        "additionalProperties": false
+                    },
+                    "strict": true
+                }
+            }
     
     Examples:
         ```python
@@ -155,7 +185,8 @@ class LLMResponse(Response):
                 "parameters": {
                     "operation": "add",
                     "numbers": [2, 2]
-                }
+                },
+                "result": 4
             }],
             finished=True,
             status_code=200
@@ -230,10 +261,11 @@ def llm_chat_with_json_output(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
         base_url: str = aios_kernel_url,
-        llms: List[Dict[str, Any]] = None
+        llms: List[Dict[str, Any]] = None,
+        response_format: Dict[str, Dict] = None
     ) -> LLMResponse:
     """
-    Perform a chat interaction with the LLM.
+    Perform a chat interaction with the LLM and return a JSON-formatted output.
     
     Args:
         agent_name: Name of the agent making the request
@@ -247,28 +279,40 @@ def llm_chat_with_json_output(
             ]
         base_url: API base URL
         llms: Optional list of LLM configurations
+        response_format: JSON schema specifying the required output format
         
     Returns:
-        LLMResponse containing the generated response
+        LLMResponse containing the generated JSON response
         
     Examples:
         ```python
-        response = llm_chat(
+        response = llm_chat_with_json_output(
             "agent1",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant."
+                    "content": "Extract keywords from the user query."
                 },
                 {
                     "role": "user",
-                    "content": "Explain quantum computing."
+                    "content": "Analyze the impact of climate change on biodiversity."
                 }
             ],
-            llms=[{
-                "name": "gpt-4",
-                "temperature": 0.7
-            }]
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "keywords",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "keywords": {
+                                "type": "array",
+                                "items": {"type": "string"}
+                            }
+                        }
+                    }
+                }
+            }
         )
         ```
     """
@@ -276,8 +320,9 @@ def llm_chat_with_json_output(
         llms=llms,
         messages=messages,
         tools=None,
-        action_type="chat",
-        message_return_type="json"
+        message_return_type="json",
+        action_type="chat"
+        # response_format=response_format
     )
     return send_request(agent_name, query, base_url)
 

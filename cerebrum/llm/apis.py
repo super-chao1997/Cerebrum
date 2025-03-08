@@ -162,7 +162,6 @@ class LLMResponse(Response):
                 {
                     "name": str,        # Tool name
                     "parameters": dict,  # Parameters used
-                    "result": Any       # Tool execution result
                 }
             ]
         finished: Whether processing completed successfully
@@ -187,7 +186,6 @@ class LLMResponse(Response):
                     "operation": "add",
                     "numbers": [2, 2]
                 },
-                "result": 4
             }],
             finished=True,
             status_code=200
@@ -244,8 +242,8 @@ def llm_chat(
                 }
             ],
             llms=[{
-                "name": "gpt-4",
-                "temperature": 0.7
+                "name": "gpt-4o-mini",
+                "backend": "openai"
             }]
         )
         ```
@@ -343,14 +341,7 @@ def llm_call_tool(
             [
                 {
                     "role": "system"|"user"|"assistant",
-                    "content": str,
-                    "name": str,  # Optional
-                    "tool_calls": [  # Optional, for assistant messages
-                        {
-                            "tool": str,  # Tool name
-                            "parameters": dict  # Tool parameters
-                        }
-                    ]
+                    "content": str
                 }
             ]
         tools: List of available tools with format:
@@ -369,9 +360,8 @@ def llm_call_tool(
         llms: Optional list of LLM configurations with format:
             [
                 {
-                    "name": str,  # e.g., "gpt-4"
-                    "temperature": float,  # 0.0-2.0
-                    "max_tokens": int
+                    "name": str,  # e.g., "gpt-4o-mini"
+                    "backend": str  # e.g., "openai"
                 }
             ]
         
@@ -385,60 +375,25 @@ def llm_call_tool(
             "agent1",
             messages=[{
                 "role": "user",
-                "content": "What is 15 * 7?"
+                "content": "search core idea of AIOS paper"
             }],
             tools=[{
-                "name": "calculator",
-                "description": "Performs basic arithmetic",
+                "name": "demo_author/arxiv", 
+                "description": "Query articles or topics in arxiv", 
                 "parameters": {
-                    "type": "object",
+                    "type": "object", 
                     "properties": {
-                        "operation": {
-                            "type": "string",
-                            "enum": ["multiply"]
-                        },
-                        "numbers": {
-                            "type": "array",
-                            "items": {"type": "number"}
+                        "query": {
+                            "type": "string", 
+                            "description": "Input query that describes what to search in arxiv"
                         }
-                    }
+                    }, 
+                    "required": ["query"]
                 }
-            }]
-        )
-        
-        # Weather and summary example
-        response = llm_call_tool(
-            "agent1",
-            messages=[{
-                "role": "user",
-                "content": "What's the weather like and give me a summary?"
             }],
-            tools=[
-                {
-                    "name": "weather_api",
-                    "description": "Gets current weather",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "location": {"type": "string"}
-                        }
-                    }
-                },
-                {
-                    "name": "text_summarizer",
-                    "description": "Summarizes text",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "text": {"type": "string"},
-                            "max_length": {"type": "integer"}
-                        }
-                    }
-                }
-            ],
             llms=[{
-                "name": "gpt-4",
-                "temperature": 0.7
+                "name": "gpt-4o-mini",
+                "backend": "openai"
             }]
         )
         ```
@@ -468,31 +423,9 @@ def llm_operate_file(
                 {
                     "role": "system"|"user"|"assistant",
                     "content": str,
-                    "name": str,  # Optional
-                    "file_operations": [  # Optional, for assistant messages
-                        {
-                            "operation": str,  # e.g., "write", "modify"
-                            "file_path": str,
-                            "content": str
-                        }
-                    ]
                 }
             ]
-        tools: List of file operation tools with format:
-            [
-                {
-                    "name": str,  # e.g., "file_writer", "code_modifier"
-                    "description": str,
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "operation": {"type": "string"},
-                            "file_path": {"type": "string"},
-                            "content": {"type": "string"}
-                        }
-                    }
-                }
-            ]
+        tools: a list of tools, default as None in this API
         base_url: API base URL
         llms: Optional list of LLM configurations
         
@@ -503,64 +436,19 @@ def llm_operate_file(
         ```python
         # Create a Python script
         response = llm_operate_file(
-            "agent1",
+            "terminal",
             messages=[{
                 "role": "user",
-                "content": "Create a script that sorts a list of numbers"
+                "content": "Write this is AIOS into the aios.txt"
             }],
-            tools=[{
-                "name": "file_writer",
-                "description": "Creates or modifies files",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {"type": "string"},
-                        "content": {"type": "string"},
-                        "format": {"type": "string", "enum": ["python", "text"]}
-                    }
-                }
-            }]
-        )
-        
-        # Modify existing code with error handling
-        response = llm_operate_file(
-            "agent1",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a code improvement assistant."
-                },
-                {
-                    "role": "user",
-                    "content": "Add error handling to the sort function in sort.py"
-                }
-            ],
-            tools=[{
-                "name": "code_modifier",
-                "description": "Modifies existing code files",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {"type": "string"},
-                        "modifications": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "type": {"type": "string", "enum": ["add", "modify", "delete"]},
-                                    "location": {"type": "string"},
-                                    "content": {"type": "string"}
-                                }
-                            }
-                        }
-                    }
-                }
-            }],
-            llms=[{
-                "name": "gpt-4",
-                "temperature": 0.3  # Lower temperature for code modifications
-            }]
-        )
+        ),
+        llms: Optional list of LLM configurations with format:
+        [
+            {
+                "name": str,  # e.g., "gpt-4o-mini"
+                "backend": str  # e.g., "openai"
+            }
+        ]
         ```
     """
     query = LLMQuery(

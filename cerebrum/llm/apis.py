@@ -454,7 +454,7 @@ def llm_call_tool(
 def llm_operate_file(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
-        tools: List[Dict[str, Any]], 
+        tools: List[Dict[str, Any]] = None, 
         base_url: str = aios_kernel_url,
         llms: List[Dict[str, Any]] = None
     ) -> LLMResponse:

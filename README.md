@@ -98,8 +98,7 @@ For example, to run the test_agent in the local directory, you can run:
 python cerebrum/run_agent.py \
     --mode local \
     --agent_path cerebrum/example/agents/test_agent \
-    --task "What is the capital of United States?" \
-    --agenthub_url https://app.aios.foundation
+    --task "What is the capital of United States?"
 ```
 
 Or run agents that are uploaded to agenthub by passing the author and agent name

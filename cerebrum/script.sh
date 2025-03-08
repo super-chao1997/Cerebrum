@@ -3,6 +3,11 @@
 # Run local agent
 python cerebrum/run_agent.py \
   --mode local \
+  --agent_path cerebrum/example/agents/demo_agent \
+  --task "What is the latest research on the topic of AI and machine learning?"
+
+python cerebrum/run_agent.py \
+  --mode local \
   --agent_path cerebrum/example/agents/test_agent \
   --task "Tell me what is the capital of United States"
 
@@ -71,6 +76,7 @@ python cerebrum/run_agent.py \
   --mode remote \
   --agent_author example \
   --agent_name test_agent \
+  --agent_version 0.0.3 \
   --agenthub_url https://app.aios.foundation \
   --task "Tell me what is the capital of United States"
 

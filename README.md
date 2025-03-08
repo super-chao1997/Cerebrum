@@ -109,6 +109,7 @@ python cerebrum/run_agent.py \
     --mode remote \
     --agent_author <author> \
     --agent_name <agent_name> \
+    --agent_version <agent_version> \
     --task <task_input> \
     --agenthub_url <agenthub_url>
 ```
@@ -120,6 +121,7 @@ python cerebrum/run_agent.py \
     --mode remote \
     --agent_author example \
     --agent_name test_agent \
+    --agent_version 0.0.3 \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 ```
@@ -202,10 +204,10 @@ To use these tools in your agent, simply include their reference (from the "How 
 If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
 
 ### APIs to build your agents
-- [LLM APIs](./cerebrum/llm/api.py)
-- [Memory APIs](./cerebrum/memory/api.py)
-- [Storage APIs](./cerebrum/storage/api.py)
-- [Tool APIs](./cerebrum/tool/api.py)
+- [LLM APIs](./cerebrum/llm/apis.py)
+- [Memory APIs](./cerebrum/memory/apis.py)
+- [Storage APIs](./cerebrum/storage/apis.py)
+- [Tool APIs](./cerebrum/tool/apis.py)
 
 ### How to upload your agents to the agenthub
 Run the following command to upload your agents to the agenthub:

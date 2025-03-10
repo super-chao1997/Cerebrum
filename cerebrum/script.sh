@@ -4,7 +4,17 @@
 python cerebrum/run_agent.py \
   --mode local \
   --agent_path cerebrum/example/agents/demo_agent \
-  --task "What is the latest research on the topic of AI and machine learning?"
+  --task "What is the idea of AIOS?"
+
+python cerebrum/run_agent.py \
+  --mode local \
+  --agent_path cerebrum/example/agents/metagpt_demo_agent \
+  --task "create a 2048 game"
+
+python cerebrum/run_agent.py \
+  --mode local \
+  --agent_path cerebrum/example/agents/autogen_demo_agent \
+  --task "help me solve a mathematical problem that x^2-4x+3=0"
 
 python cerebrum/run_agent.py \
   --mode local \

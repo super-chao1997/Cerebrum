@@ -61,8 +61,8 @@ jobs:
         KERNEL_PID=$!
         cd ..
         
-        # Set maximum wait time (10 seconds)
-        max_wait=10
+        # Set maximum wait time (60 seconds)
+        max_wait=60
         start_time=$SECONDS
         
         # Dynamically check if the process is running until it succeeds or times out

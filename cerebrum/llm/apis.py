@@ -2,7 +2,11 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any, Union
 from typing_extensions import Literal
 
-from cerebrum.utils.communication import Query, Response, send_request, aios_kernel_url
+from cerebrum.utils.communication import Query, Response, send_request
+
+from cerebrum.config.config_manager import config
+
+aios_kernel_url = config.get_kernel_url()
 
 class LLMQuery(Query):
     """

@@ -1,7 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Union, Optional
 
-from cerebrum.utils.communication import Query, send_request, Response, aios_kernel_url
+from cerebrum.utils.communication import Query, send_request, Response
+from cerebrum.config.config_manager import config
+
+aios_kernel_url = config.get_kernel_url()
 
 class StorageQuery(Query):
     """

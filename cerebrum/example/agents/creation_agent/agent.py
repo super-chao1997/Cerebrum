@@ -3,6 +3,10 @@ from cerebrum.interface import AutoTool
 import os
 import json
 
+from cerebrum.config.config_manager import config
+
+aios_kernel_url = config.get_kernel_url()
+
 class CreationAgent:
     def __init__(self, agent_name):
         self.agent_name = agent_name
@@ -78,7 +82,7 @@ class CreationAgent:
             response = llm_chat(
                 agent_name=self.agent_name,
                 messages=self.messages,
-                base_url="http://localhost:8000"
+                base_url=aios_kernel_url
             )["response"]
 
             workflow = self.check_workflow(response["response_message"])

@@ -23,7 +23,7 @@ class ConfigManager:
     
     def _load_default_config(self):
         """Load default configuration from YAML file"""
-        config_path = Path(__file__).parent / "default.yaml"
+        config_path = Path(__file__).parent / "config.yaml"
         try:
             with open(config_path, 'r') as f:
                 self._config = yaml.safe_load(f)
@@ -64,7 +64,10 @@ class ConfigManager:
             if current is None:
                 return default
         return current
-
+    
+    def get_kernel_url(self) -> str:
+        return self.get('kernel', 'base_url')
+    
     def update(self, **kwargs):
         """Update configuration with new values"""
         for key, value in kwargs.items():

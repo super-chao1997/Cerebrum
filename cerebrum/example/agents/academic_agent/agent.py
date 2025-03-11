@@ -2,6 +2,9 @@ from cerebrum.llm.apis import llm_chat, llm_call_tool
 from cerebrum.interface import AutoTool
 import os
 import json
+from cerebrum.config.config_manager import config
+
+aios_kernel_url = config.get_kernel_url()
 
 class AcademicAgent:
     def __init__(self, agent_name):
@@ -157,14 +160,14 @@ class AcademicAgent:
                             agent_name=self.agent_name,
                             messages=self.messages,
                             tools=selected_tools,
-                            base_url="http://localhost:8000",
+                            base_url=aios_kernel_url,
                         )["response"]
 
                     elif action_type == "chat":
                         response = llm_chat(
                             agent_name=self.agent_name,
                             messages=self.messages,
-                            base_url="http://localhost:8000",
+                            base_url=aios_kernel_url,
                         )["response"]
 
                     self.messages.append({"role": "assistant", "content": response["response_message"]})

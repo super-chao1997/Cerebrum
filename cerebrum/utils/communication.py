@@ -4,7 +4,9 @@ from typing_extensions import Literal
 import requests
 from typing import Dict, Any, List
 
-aios_kernel_url = "http://localhost:8000"
+from cerebrum.config.config_manager import config
+
+aios_kernel_url = config.get_kernel_url()
 
 class Query(BaseModel):
     """

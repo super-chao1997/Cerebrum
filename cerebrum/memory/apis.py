@@ -16,7 +16,7 @@ class MemoryQuery(Query):
         params (Dict): Parameters specific to each action type
     """
     query_class: str = "memory"
-    action_type: Literal["create", "read", "update", "delete", "search"]
+    operation_type: Literal["add_memory", "get_memory", "update_memory", "remove_memory", "retrieve_memory", "add_agentic_memory","retrieve_memory_raw"]
     params: Dict[str, Any] = Field(default_factory=dict)
     
     class Config:
@@ -42,7 +42,7 @@ class MemoryResponse(Response):
     search_results: Optional[List[Dict[str, Any]]] = None
     success: bool = False
     error: Optional[str] = None
-    status_code: int = 200
+    # status_code: int = 200
 
     class Config:
         arbitrary_types_allowed = True
@@ -70,7 +70,35 @@ def create_memory(agent_name: str,
         >>> print(response.success)    # True
     """
     query = MemoryQuery(
-        action_type="create",
+        operation_type="add_memory",
+        params={"content": content, "metadata": metadata or {}}
+    )
+    return send_request(agent_name, query, base_url)
+
+def create_agentic_memory(agent_name: str, 
+                 content: str, 
+                 metadata: Optional[Dict[str, Any]] = None,
+                 base_url: str = aios_kernel_url) -> MemoryResponse:
+    """Create a new memory note.
+    
+    Args:
+        agent_name: Name of the agent to handle the request
+        content: Content of the memory
+        metadata: Optional metadata (keywords, context, tags, etc.)
+        base_url: Base URL for the API server
+        
+    Returns:
+        MemoryResponse containing the created memory ID
+        
+    Example:
+        >>> # Create a memory with content and metadata
+        >>> metadata = {"tags": ["important", "meeting"], "priority": "high"}
+        >>> response = create_memory("agent1", "Meeting notes: Discussed Q1 goals", metadata)
+        >>> print(response.memory_id)  # "mem_123abc"
+        >>> print(response.success)    # True
+    """
+    query = MemoryQuery(
+        operation_type="add_agentic_memory",
         params={"content": content, "metadata": metadata or {}}
     )
     return send_request(agent_name, query, base_url)
@@ -95,7 +123,7 @@ def read_memory(agent_name: str,
         >>> print(response.metadata)   # {"tags": ["important", "meeting"], "priority": "high"}
     """
     query = MemoryQuery(
-        action_type="read",
+        operation_type="get_memory",
         params={"memory_id": memory_id}
     )
     return send_request(agent_name, query, base_url)
@@ -129,13 +157,14 @@ def update_memory(agent_name: str,
         >>> print(response.success)    # True
     """
     params = {"memory_id": memory_id}
-    if content is not None:
-        params["content"] = content
     if metadata is not None:
         params["metadata"] = metadata
-        
+    if content is not None:
+        params["content"] = content
+    else:
+        params["content"] = None
     query = MemoryQuery(
-        action_type="update",
+        operation_type="update_memory",
         params=params
     )
     return send_request(agent_name, query, base_url)
@@ -159,7 +188,7 @@ def delete_memory(agent_name: str,
         >>> print(response.success)    # True
     """
     query = MemoryQuery(
-        action_type="delete",
+        operation_type="remove_memory",
         params={"memory_id": memory_id}
     )
     return send_request(agent_name, query, base_url)
@@ -191,7 +220,7 @@ def search_memories(agent_name: str,
         # Score: 0.92
     """
     query = MemoryQuery(
-        action_type="search",
-        params={"query": query, "k": k}
+        operation_type="retrieve_memory",
+        params={"content": query, "k": k}
     )
     return send_request(agent_name, query, base_url)

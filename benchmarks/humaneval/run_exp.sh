@@ -1,6 +1,6 @@
 # Step 0: Install the humaneval benchmark
-# git clone https://github.com/openai/human-eval
-# pip install -e human-eval
+git clone https://github.com/openai/human-eval
+pip install -e human-eval
 
 # Step 1: Run the inference
 python -m benchmarks.humaneval.inference \

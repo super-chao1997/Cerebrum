@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from typing import List
 from datasets import load_dataset
@@ -7,23 +8,12 @@ from ..utils import get_parser
 
 
 def parse_result(result: str):
-    match = re.search(r'<FINAL ANSWER>\s*([\s\S]*?)\s*</FINAL ANSWER>', result)
-    if match:
-        result = match.group(1)
-    match = re.search(r'```python\s*([\s\S]*?)```', result)
-    if match:
-        result = match.group(1)
-
-    if not result.startswith("def") or not result.startswith("import"):
-        result += "    "
-
-    code_lines = result.split("\n")
-    for line in code_lines[:]:
-        if line.startswith("def"):
-            code_lines.remove(line)
-        elif line.startswith("import"):
-            line += "    "
-    result = "\n".join(code_lines)
+    start_idx = result.find("<FINAL_ANSWER>")
+    end_idx = result.find("</FINAL_ANSWER>")
+    if start_idx != -1 and end_idx != -1:
+        result = result[start_idx + len("<FINAL_ANSWER>"):end_idx]
+    else:
+        result = ""
 
     return result
 
@@ -39,9 +29,24 @@ def write_output_func(result_list: List, output_file: str):
 def process_one_func(data, meta_data: MetaData):
     
     agent = AGENT_TYPE_MAPPING_AIOS[meta_data.agent_type](meta_data.on_aios)
-    # breakpoint()
     result = agent.run_humaneval(data["prompt"])
+    # breakpoint()
     result = parse_result(result)
+    # breakpoint()
+    
+    check_program = (
+        data["prompt"]
+        + result
+        + "\n"
+        + data["test"]
+        + "\n"
+        + f"check({data['entry_point']})"
+    )
+    task_id = data["task_id"].split("/")[-1]
+    
+    path = os.path.join(os.path.dirname(__file__), "programs")
+    with open(os.path.join(path, f"program{task_id}.py"), "w") as f:
+        f.write(check_program)
 
     prediction = {
         "task_id": data["task_id"],

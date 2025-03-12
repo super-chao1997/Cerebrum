@@ -145,7 +145,9 @@ class LLMQuery(Query):
     llms: Optional[List[Dict[str, Any]]] = Field(default=None)
     messages: List[Dict[str, Union[str, Any]]]
     tools: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
-    action_type: Literal["chat", "tool_use", "operate_file"] = Field(default="chat")
+    action_type: Literal["chat", "chat_with_json_output", "chat_with_tool_call_output", "tool_use", "operate_file"] = Field(default="chat")
+    temperature: float = Field(default=1.0)
+    max_new_tokens: int = Field(default=1000)
     message_return_type: Literal["text", "json"] = Field(default="text")
     response_format: Optional[Dict[str, Any]] = Field(default=None)
 
@@ -324,10 +326,91 @@ def llm_chat_with_json_output(
         messages=messages,
         tools=None,
         message_return_type="json",
-        action_type="chat",
+        action_type="chat_with_json_output",
         response_format=response_format
     )
     return send_request(agent_name, query, base_url)
+
+def llm_chat_with_tool_call_output(
+        agent_name: str, 
+        messages: List[Dict[str, Any]], 
+        base_url: str = aios_kernel_url,
+        llms: List[Dict[str, Any]] = None
+    ) -> LLMResponse:
+    """
+    Perform a chat interaction with the LLM and return a tool call output.
+    
+    Args:
+        agent_name: Name of the agent making the request
+        messages: List of message dictionaries with format:
+            [
+                {
+                    "role": "system"|"user"|"assistant",
+                    "content": str
+                }
+            ]
+        tools: List of available tools with format:
+            [
+                {
+                    "name": str,  # Tool identifier
+                    "description": str,  # Tool description
+                    "parameters": {  # JSON Schema for parameters
+                        "type": "object",
+                        "properties": {...},
+                        "required": [...]
+                    }
+                }
+            ]
+        base_url: API base URL
+        llms: Optional list of LLM configurations with format:
+            [
+                {
+                    "name": str,  # e.g., "gpt-4o-mini"
+                    "backend": str  # e.g., "openai"
+                }
+            ]
+        
+    Returns:
+        LLMResponse containing tool calls and results
+        
+    Examples:
+        ```python
+        # Calculator tool example
+        response = llm_call_tool(
+            "agent1",
+            messages=[{
+                "role": "user",
+                "content": "search core idea of AIOS paper"
+            }],
+            tools=[{
+                "name": "demo_author/arxiv", 
+                "description": "Query articles or topics in arxiv", 
+                "parameters": {
+                    "type": "object", 
+                    "properties": {
+                        "query": {
+                            "type": "string", 
+                            "description": "Input query that describes what to search in arxiv"
+                        }
+                    }, 
+                    "required": ["query"]
+                }
+            }],
+            llms=[{
+                "name": "gpt-4o-mini",
+                "backend": "openai"
+            }]
+        )
+        ```
+    """
+    query = LLMQuery(
+        llms=llms,
+        messages=messages,
+        tools=None,
+        action_type="chat_with_tool_call_output"
+    )
+    return send_request(agent_name, query, base_url)
+
 
 def llm_call_tool(
         agent_name: str, 

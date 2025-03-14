@@ -62,8 +62,14 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    source cerebrum-env/bin/activate
    ```
 
-6. **Install the package**
+6. **Install the package**  
+   Using uv (Recommended)
    ```bash
+   pip install uv
+   uv pip install -e .
+   ```
+   or using pip
+   ```
    pip install -e .
    ```
 
@@ -125,6 +131,19 @@ python cerebrum/run_agent.py \
     --agenthub_url https://app.aios.foundation
 ```
 
+
+### Useful commands to use
+#### Agents
+- [List agents from agenthub](./cerebrum/commands/list_agenthub_agents.py)
+- [Download agents](./cerebrum/commands/download_agent.py)
+- [Upload agent](./cerebrum/commands/upload_agent.py)
+
+#### Tools
+- [List tools from toolhub](./cerebrum/commands/list_toolhub_tools.py)
+- [List tools from local](./cerebrum/commands/list_local_tools.py)
+- [Upload tool](./cerebrum/commands/upload_tool.py)
+
+
 ## 🚀 Develop and customize new agents
 
 This guide will walk you through creating and publishing your own agents for AIOS. 
@@ -179,34 +198,49 @@ Your agent needs a config.json file that describes its functionality. Here's wha
 }
 ```
 
-### Available tools
-
-When setting up your agent, you'll need to specify which tools it will use. Below is a list of all currently available tools and how to reference them in your configuration:
-
-| Author | Name | How to call them |
-|:--|:--|:--|
-| example | arxiv | example/arxiv |
-| example | bing_search | example/bing_search |
-| example | currency_converter | example/currency_converter |
-| example | wolfram_alpha | example/wolfram_alpha |
-| example | google_search | example/google_search |
-| openai | speech_to_text | openai/speech_to_text |
-| example | web_browser | example/web_browser |
-| timbrooks | image_to_image | timbrooks/image_to_image |
-| example | downloader | example/downloader |
-| example | doc_question_answering | example/doc_question_answering |
-| stability-ai | text_to_image | stability-ai/text_to_image |
-| example | text_to_speech | example/text_to_speech |
-
-To use these tools in your agent, simply include their reference (from the "How to Use" column) in your agent's configuration file. For example, if you want your agent to be able to search academic papers and convert currencies, you would include both `example/arxiv` and `example/currency_converter` in your configuration.
-
-If you would like to create your new tools, you can either integrate the tool within your agent code or you can follow the tool examples in the [tool folder](./cerebrum/example/tools/) to develop your standalone tools. The detailed instructions are in [How to develop new tools](#develop-and-publish-new-tools)
-
 ### APIs to build your agents
 - [LLM APIs](./cerebrum/llm/apis.py)
 - [Memory APIs](./cerebrum/memory/apis.py)
 - [Storage APIs](./cerebrum/storage/apis.py)
 - [Tool APIs](./cerebrum/tool/apis.py)
+
+### Available tools
+
+There are two ways to use tools in your agents:
+
+#### 1. Use tools from ToolHub
+
+You can list all available tools in the ToolHub using the following command:
+
+```bash
+list-toolhub-tools
+```
+
+This will display all tools available in the remote ToolHub. 
+
+To load a tool from ToolHub in your code:
+
+```python
+from cerebrum.interface import AutoTool
+tool = AutoTool.from_preloaded("example/arxiv", local=False)
+```
+
+#### 2. Use tools from local folders
+
+You can also list tools available in your local environment using the following command:
+
+```bash
+list-local-tools
+```
+
+To load a local tool in your code:
+
+```python
+from cerebrum.tool import AutoTool
+tool = AutoTool.from_preloaded("local/my_custom_tool", local=True)
+```
+
+If you would like to create your new tools, refer to [How to develop new tools](#develop-and-publish-new-tools)
 
 ### How to upload your agents to the agenthub
 Run the following command to upload your agents to the agenthub:
@@ -228,26 +262,8 @@ demo_author/
     └── config.json   # Tool configuration and metadata
 ```
 
-### Setting up config.json
-Your tool needs a configuration file that describes its properties. Here's an example of how to set it up:
+> [!IMPORTANT] To use the agents in your local device, you need to put the tool folder under the cerebrum/tool/core folder
 
-```json
-{
-    "name": "arxiv",
-    "description": [
-        "The arxiv tool that can be used to search for papers on arxiv"
-    ],
-    "meta": {
-        "author": "demo_author",
-        "version": "1.0.6",
-        "license": "CC0"
-    },
-    "build": {
-        "entry": "tool.py",
-        "module": "Arxiv"
-    }
-}
-```
 ### Create Tool Class
 In `entry.py`, you'll need to implement a tool class which is identified in the config.json with two essential methods:
 
@@ -257,46 +273,97 @@ In `entry.py`, you'll need to implement a tool class which is identified in the 
 Here's an example:
 
 ```python
-class Arxiv:
+class Wikipedia:
+    def __init__(self):
+        super().__init__()
+        self.WIKIPEDIA_MAX_QUERY_LENGTH = 300
+        self.top_k_results = 3
+        self.lang = "en"
+        self.load_all_available_meta: bool = False
+        self.doc_content_chars_max: int = 4000
+        self.wiki_client = self.build_client()
+
+    def build_client(self):
+        try:
+            import wikipedia
+            wikipedia.set_lang(self.lang)
+
+        except ImportError:
+            raise ImportError(
+                "Could not import wikipedia python package. "
+                "Please install it with `pip install wikipedia`."
+            )
+        return wikipedia
+
+    def run(self, params) -> str:
+        """Run Wikipedia search and get page summaries."""
+        query = params["query"]
+        page_titles = self.wiki_client.search(query, results=self.top_k_results)
+        summaries = []
+        for page_title in page_titles[: self.top_k_results]:
+            if wiki_page := self._fetch_page(page_title):
+                if summary := self._formatted_page_summary(page_title, wiki_page):
+                    summaries.append(summary)
+        if not summaries:
+            return "No good Wikipedia Search Result was found"
+        return "\n\n".join(summaries)[: self.doc_content_chars_max]
+
+    @staticmethod
+    def _formatted_page_summary(page_title: str, wiki_page: Any) -> Optional[str]:
+        return f"Page: {page_title}\nSummary: {wiki_page.summary}"
+
     def get_tool_call_format(self):
         tool_call_format = {
-            "type": "function",
-            "function": {
-                "name": "demo_author/arxiv",
-                "description": "Query articles or topics in arxiv",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "Input query that describes what to search in arxiv"
-                        }
-                    },
-                    "required": [
-                        "query"
-                    ]
-                }
-            }
-        }
+			"type": "function",
+			"function": {
+				"name": "wikipedia",
+				"description": "Provides relevant information about the destination",
+				"parameters": {
+					"type": "object",
+					"properties": {
+						"query": {
+							"type": "string",
+							"description": "Search query for Wikipedia"
+						}
+					},
+					"required": [
+						"query"
+					]
+				}
+			}
+		}
         return tool_call_format
-
-    def run(self, params: dict):
-        """
-        Main tool logic goes here.
-        Args:
-            params: Dictionary containing tool parameters
-        Returns:
-            Your tool's output
-        """
-        # Your code here
-        result = do_something(params['param_name'])
-        return result
 ```
 
-### Integration Tips
-When integrating your tool for the agents you develop:
-- Use absolute paths to reference your tool in agent configurations
-- Example: `/path/to/your/tools/example/your_tool` instead of just `author/tool_name`
+
+### How to publish tools to the toolhub
+Before publishing tools, you need to set up the configurations as the following: 
+
+```json
+{
+    "name": "wikipedia",
+    "description": [
+        "Search information in the wikipedia"
+    ],
+    "meta": {
+        "author": "example",
+        "version": "0.0.1",
+        "license": "CC0"
+    },
+    "build": {
+        "entry": "tool.py",
+        "module": "Wikipedia"
+    }
+}
+```
+
+then you can use the following command to upload tool
+
+```python
+python cerebrum/commands/upload_tool.py \
+    --tool_path <tool_path> \ # tool path to the tool directory
+    --toolhub_url <toolhub_url> # the url of the toolhub, default is https://app.aios.foundation
+```
 
 ## Supported LLM Cores
 | Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ | Backend ⚙️ | Required API Key |

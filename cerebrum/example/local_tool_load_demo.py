@@ -1,8 +1,7 @@
-from pathlib import Path
-from cerebrum.manager.tool import ToolManager
+from cerebrum.interface import AutoTool
 
-manager = ToolManager(base_url='https://app.aios.foundation')
+tool = AutoTool.from_preloaded('file/file_downloader', local=True)
 
-tool = manager.load_tool(local=True, name='bing_search')
+breakpoint()
 
 print(tool)

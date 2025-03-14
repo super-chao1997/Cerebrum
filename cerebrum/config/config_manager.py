@@ -68,6 +68,12 @@ class ConfigManager:
     def get_kernel_url(self) -> str:
         return self.get('kernel', 'base_url')
     
+    def get_agent_hub_url(self) -> str:
+        return self.get('manager', 'agent_hub_url')
+    
+    def get_tool_hub_url(self) -> str:
+        return self.get('manager', 'tool_hub_url')
+    
     def update(self, **kwargs):
         """Update configuration with new values"""
         for key, value in kwargs.items():

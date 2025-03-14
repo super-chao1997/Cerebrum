@@ -26,14 +26,15 @@ from cerebrum.manager.tool import ToolManager
 class AutoTool:
     # hub_url = config.get('manager', 'tool_hub_url')
     hub_url = "https://app.aios.foundation"
-    print(f"[DEBUG] Using Tool Hub URL: {hub_url}")
+    # print(f"[DEBUG] Using Tool Hub URL: {hub_url}")
     TOOL_MANAGER = ToolManager(hub_url)
 
     @classmethod
-    def from_preloaded(cls, tool_name: str):
-        n_slash = tool_name.count('/')
-        if n_slash == 1: # load from author/name
-        # if tool_name.split('/')[0] != 'core':
+    def from_preloaded(cls, tool_name: str, local: bool = False):
+        # n_slash = tool_name.count('/')
+        # breakpoint()
+        # if n_slash == 1: # load from author/name
+        if not local:
             try:
                 author, name, version = cls.TOOL_MANAGER.download_tool(
                     author=tool_name.split('/')[0],
@@ -41,32 +42,35 @@ class AutoTool:
                 )
                 tool, _ = cls.TOOL_MANAGER.load_tool(author, name, version)
             except:
-                print('reload',tool_name.split('/')[1])
-                tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name.split('/')[1])
+                # print('reload',tool_name.split('/')[1])
+                raise Exception(f"Tool {tool_name} not found in the tool hub")
+                # tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name.split('/')[1])
         else:
-            tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name)
+            try:
+                tool, _ = cls.TOOL_MANAGER.load_tool(local=True, name=tool_name)
+            except:
+                raise Exception(f"Tool {tool_name} not found in your local device")
         
         #return tool instance, not class
         return tool()
     
     @classmethod
-    def from_batch_preload(cls, tool_names: list[str]):
-        response = {
-             'tools': [],
-             'tool_info': []
-        }
-
+    def from_batch_preloaded(cls, tool_names: list[str]):
+        # response = {
+        #     'tools': [],
+        #     'tool_info': []
+        # }
+        tools = []
         for tool_name in tool_names:
-             print('tool name', tool_name)
-             tool = AutoTool.from_preloaded(tool_name)
+            print('tool name', tool_name)
+            tool = AutoTool.from_preloaded(tool_name)
+            tools.append(tool)
+            # response['tools'].append(tool.get_tool_call_format())
+            # response['tool_info'].append(
+            #     {
+            #         "name": tool.get_tool_call_format()["function"]["name"],
+            #         "description": tool.get_tool_call_format()["function"]["description"],
+            #     }
+            # )
 
-             response['tools'].append(tool.get_tool_call_format())
-             response['tool_info'].append(
-                {
-                    "name": tool.get_tool_call_format()["function"]["name"],
-                    "description": tool.get_tool_call_format()["function"]["description"],
-                }
-             )
-
-
-        return response
+        return tools

@@ -16,6 +16,7 @@ class BingSearch(BaseTool):
         super().__init__()
         self.url = "https://api.bing.microsoft.com/v7.0/search" # temporarily
         self.bing_subscription_key = get_from_env("BING_SUBSCRIPTION_KEY")
+        # self.bing_subscription_key = None
         self.k: int = 10 # topk searched results
         # search_kwargs: dict
 
@@ -53,3 +54,25 @@ class BingSearch(BaseTool):
             snippets.append(result["snippet"])
 
         return " ".join(snippets)
+    
+    def get_tool_call_format(self):
+        tool_call_format = {
+            "type": "function",
+            "function": {
+                "name": "bing_search",
+                "description": "search information using bing search api",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "query to search information using bing search api"
+                        }
+                    },
+                    "required": [
+                        "query"
+                    ]
+                }
+            }
+        }
+        return tool_call_format

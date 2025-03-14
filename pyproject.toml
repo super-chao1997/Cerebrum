@@ -41,9 +41,13 @@ exclude = [
 files = ["requirements.txt"]
 
 [project.scripts]
-run-agent = "cerebrum.run_agent:main"
-download-agent = "cerebrum.download_agent:main"
-upload-agent = "cerebrum.upload_agent:main"
+run-agent = "cerebrum.commands.run_agent:main"
+download-agent = "cerebrum.commands.download_agent:main"
+upload-agent = "cerebrum.commands.upload_agent:main"
+list-agenthub-agents = "cerebrum.commands.list_agent:main"
+list-toolhub-tools = "cerebrum.commands.list_toolhub_tools:main"
+list-local-tools = "cerebrum.commands.list_local_tools:main"
+upload-tool = "cerebrum.commands.upload_tool:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

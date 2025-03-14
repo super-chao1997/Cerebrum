@@ -145,7 +145,7 @@ class LLMQuery(Query):
     llms: Optional[List[Dict[str, Any]]] = Field(default=None)
     messages: List[Dict[str, Union[str, Any]]]
     tools: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
-    action_type: Literal["chat", "chat_with_json_output", "chat_with_tool_call_output", "tool_use", "operate_file"] = Field(default="chat")
+    action_type: Literal["chat", "chat_with_json_output", "chat_with_tool_call_output", "call_tool", "operate_file"] = Field(default="chat")
     temperature: float = Field(default=1.0)
     max_new_tokens: int = Field(default=1000)
     message_return_type: Literal["text", "json"] = Field(default="text")
@@ -324,7 +324,6 @@ def llm_chat_with_json_output(
     query = LLMQuery(
         llms=llms,
         messages=messages,
-        tools=None,
         message_return_type="json",
         action_type="chat_with_json_output",
         response_format=response_format
@@ -334,6 +333,7 @@ def llm_chat_with_json_output(
 def llm_chat_with_tool_call_output(
         agent_name: str, 
         messages: List[Dict[str, Any]], 
+        tools: List[Dict[str, Any]],
         base_url: str = aios_kernel_url,
         llms: List[Dict[str, Any]] = None
     ) -> LLMResponse:
@@ -406,7 +406,7 @@ def llm_chat_with_tool_call_output(
     query = LLMQuery(
         llms=llms,
         messages=messages,
-        tools=None,
+        tools=tools,
         action_type="chat_with_tool_call_output"
     )
     return send_request(agent_name, query, base_url)

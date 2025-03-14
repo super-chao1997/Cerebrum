@@ -17,7 +17,7 @@ import re
 import hashlib
 
 from cerebrum.manager.package import AgentPackage
-from cerebrum.utils.manager import get_newest_version
+from cerebrum.utils.manager import get_newest_version, compare_versions
 
 logger = logging.getLogger(__name__)
 
@@ -235,20 +235,46 @@ class AgentManager:
         except Exception as e:
             logger.error(f"Error reading metadata from {config_path}: {str(e)}")
             raise
+    
+    def list_local_agents(self) -> List[Dict[str, str]]:
+        return NotImplementedError
 
-    def list_available_agents(self) -> List[Dict[str, str]]:
+    def list_agenthub_agents(self) -> List[Dict[str, str]]:
         response = requests.get(f"{self.base_url}/cerebrum/get_all_agents")
         response.raise_for_status()
 
         response: dict = response.json()
 
-        agent_list = []
+        # Dictionary to track the latest version of each agent
+        latest_agents = {}
 
         for v in list(response.values())[:-1]:
-            agent_list.append({
-                "agent": "/".join([v["author"], v["name"], v['version']])
-            })
+            agent_key = f"{v['author']}/{v['name']}"
+            
+            # If we haven't seen this agent before, add it
+            if agent_key not in latest_agents:
+                latest_agents[agent_key] = {
+                    "name": v["name"],
+                    "author": v["author"],
+                    "version": v["version"],
+                    "description": v["description"]
+                }
+            else:
+                # If we've seen this agent, check if this version is newer
+                current_version = latest_agents[agent_key]["version"]
+                new_version = v["version"]
+                
+                # Compare versions (assuming semantic versioning)
+                if compare_versions(new_version, current_version) > 0:
+                    latest_agents[agent_key] = {
+                        "name": v["name"],
+                        "author": v["author"],
+                        "version": v["version"],
+                        "description": v["description"]
+                    }
 
+        # Convert dictionary to list
+        agent_list = list(latest_agents.values())
         return agent_list
 
     def check_agent_updates(self, author: str, name: str, current_version: str) -> bool:

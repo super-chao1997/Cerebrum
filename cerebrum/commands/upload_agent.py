@@ -1,8 +1,8 @@
 from cerebrum.manager.agent import AgentManager
 
 import argparse
-
-if __name__ == "__main__":
+import sys
+def main():
     parser = argparse.ArgumentParser(description="Upload agents")
     parser.add_argument(
         "--agent_path",
@@ -20,3 +20,6 @@ if __name__ == "__main__":
     agent_package = manager.package_agent(args.agent_path)
 
     manager.upload_agent(agent_package)
+
+if __name__ == "__main__":
+    sys.exit(main())

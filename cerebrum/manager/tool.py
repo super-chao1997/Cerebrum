@@ -61,7 +61,7 @@ class ToolManager:
         """Download a tool from the remote server."""
         if version is None:
             cached_versions = self._get_cached_versions(author, name)
-            version = self._get_newest_version(cached_versions)
+            version = get_newest_version(cached_versions)
 
         try:
             cache_path = self._get_cache_path(author, name, version)
@@ -104,7 +104,7 @@ class ToolManager:
         if not local:
             if version is None:
                 cached_versions = self._get_cached_versions(author, name)
-                version = self._get_newest_version(cached_versions)
+                version = get_newest_version(cached_versions)
 
             tool_path = self._get_cache_path(author, name, version)
             

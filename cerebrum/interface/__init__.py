@@ -62,7 +62,7 @@ class AutoTool:
         # }
         tools = []
         for tool_name in tool_names:
-            print('tool name', tool_name)
+            # print('tool name', tool_name)
             tool = AutoTool.from_preloaded(tool_name)
             tools.append(tool)
             # response['tools'].append(tool.get_tool_call_format())

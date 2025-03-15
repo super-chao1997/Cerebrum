@@ -4,7 +4,9 @@ from enum import Enum
 from typing import Callable
 
 from cerebrum.llm.apis import llm_chat
+from cerebrum.config.config_manager import config
 
+aios_kernel_url = config.get_kernel_url()
 
 class FrameworkType(Enum):
     """

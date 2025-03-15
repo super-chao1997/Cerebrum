@@ -489,7 +489,7 @@ def llm_call_tool(
         llms=llms,
         messages=messages,
         tools=tools,
-        action_type="tool_use"
+        action_type="call_tool"
     )
     return send_request(agent_name, query, base_url)
 

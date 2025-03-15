@@ -6,6 +6,8 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.box import ROUNDED
 
+import sys
+
 def list_agenthub_agents():
     console = Console()
     
@@ -52,5 +54,8 @@ def list_agenthub_agents():
     console.print(summary)
     console.print("\n")  # Add some space after the summary
 
-if __name__ == "__main__":
+def main():
     list_agenthub_agents()
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -276,6 +276,68 @@ class AgentManager:
         # Convert dictionary to list
         agent_list = list(latest_agents.values())
         return agent_list
+    
+    def list_local_agents(self) -> List[Dict[str, str]]:
+        """
+        List all available agents from the local example directory.
+        
+        Returns:
+            List[Dict[str, str]]: List of dictionaries containing agent information
+        """
+        local_agents = []
+        
+        # Define possible base directories for local agents
+        base_dirs = [
+            os.path.join(os.path.dirname(self.base_path), "cerebrum", "example", "agents"),
+            os.path.join(os.path.dirname(self.base_path), "example", "agents"),
+            os.path.join(os.getcwd(), "cerebrum", "example", "agents"),
+            os.path.join(os.getcwd(), "example", "agents")
+        ]
+        
+        # Find the first valid base directory
+        base_dir = None
+        for dir_path in base_dirs:
+            if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                base_dir = dir_path
+                break
+        
+        if not base_dir:
+            logger.warning(f"Could not find local agents directory. Tried: {base_dirs}")
+            return local_agents
+        
+        # Scan for agent directories
+        for agent_dir in os.listdir(base_dir):
+            agent_path = os.path.join(base_dir, agent_dir)
+            
+            # Skip if not a directory
+            if not os.path.isdir(agent_path):
+                continue
+                
+            # Check for config.json to verify it's an agent
+            config_path = os.path.join(agent_path, "config.json")
+            if not os.path.exists(config_path):
+                continue
+                
+            try:
+                # Load agent metadata from config.json
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                
+                # Extract agent information
+                agent_info = {
+                    "name": config.get("name", agent_dir),
+                    "path": agent_path,
+                    "author": config.get("meta", {}).get("author", "local"),
+                    "version": config.get("meta", {}).get("version", "0.0.1"),
+                    "description": "\n".join(config.get("description", ["No description available"]))
+                }
+                
+                local_agents.append(agent_info)
+                
+            except Exception as e:
+                logger.warning(f"Error loading agent from {agent_path}: {str(e)}")
+        
+        return local_agents
 
     def check_agent_updates(self, author: str, name: str, current_version: str) -> bool:
         response = requests.get(f"{self.base_url}/cerebrum/check_updates", params={

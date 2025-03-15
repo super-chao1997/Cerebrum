@@ -27,7 +27,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    cd Cerebrum
    ```
 
-3. **Create Virtual Environment**
+2. **Create Virtual Environment**
    ```bash
    conda create -n cerebrum-env python=3.10
    ```
@@ -44,7 +44,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    python3 -m venv cerebrum-env
    ```
 
-4. **Activate the environment**
+3. **Activate the environment**
    ```bash
    conda activate myenv
    ```
@@ -62,7 +62,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    source cerebrum-env/bin/activate
    ```
 
-6. **Install the package**  
+4. **Install the package**  
    Using uv (Recommended)
    ```bash
    pip install uv
@@ -73,7 +73,7 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
    pip install -e .
    ```
 
-7. **Verify installation**
+5. **Verify installation**
    ```bash
    python -c "import cerebrum; from cerebrum.client import Cerebrum; print(Cerebrum)"
    ```
@@ -83,15 +83,62 @@ The AIOS-Agent SDK is designed for agent users and developers, enabling them to 
 >
 > Please see our [documentation](https://docs.aios.foundation/) for more information.
 
-1. **Start the AIOS Kernel** 
-   📝 See [here](https://docs.aios.foundation/getting-started/installation).
+### 1. Start the AIOS Kernel
+📝 See [here](https://docs.aios.foundation/getting-started/installation).
 
-2. **Run agents**
+Below are some useful commands to use
+- [List agents from agenthub](./cerebrum/commands/list_agenthub_agents.py)
+    ```bash
+    list-agenthub-agents
+    ```
+- [List agents from local](./cerebrum/commands/list_local_agents.py)
+    ```
+    list-local-agents
+    ```
+- [Download agents](./cerebrum/commands/download_agent.py)
+    ```bash
+    download-agent \
+        --agent_author <agent_author> \
+        --agent_name <agent_name> \
+        --agent_version <agent_version> \
+        --agenthub_url <agenthub_url>
+    ```
+- [Upload agent](./cerebrum/commands/upload_agent.py)
+    ```bash
+    upload-agents \
+        --agent_path <agent_path> \
+        --agenthub_url <agenthub_url>
+    ```
+
+- [List tools from toolhub](./cerebrum/commands/list_toolhub_tools.py)
+    ```bash
+    list-toolhub-tools
+    ```
+- [List tools from local](./cerebrum/commands/list_local_tools.py)
+    ```bash
+    list-local-tools
+    ```
+- [Download tool](./cerebrum/commands/download_tool.py)
+    ```bash
+    download-tool \
+        --tool_author <tool_author> \
+        --tool_name <tool_name> \
+        --tool_version <tool_version> \
+        --toolhub_url <toolhub_url>
+    ```
+- [Upload tool](./cerebrum/commands/upload_tool.py)
+    ```bash
+    upload-tool \
+        --tool_path <tool_path> \
+        --toolhub_url <toolhub_url>
+    ```
+
+### 2. Run agents
 
 Either run agents that already exist in the local by passing the path to the agent directory
 
 ```
-python cerebrum/run_agent.py \
+run-agent \
     --mode local \
     --agent_path <agent_name_or_path> \ # path to the agent directory
     --task <task_input> \
@@ -101,7 +148,7 @@ python cerebrum/run_agent.py \
 For example, to run the test_agent in the local directory, you can run:
 
 ```
-python cerebrum/run_agent.py \
+run-agent \
     --mode local \
     --agent_path cerebrum/example/agents/test_agent \
     --task "What is the capital of United States?"
@@ -110,7 +157,7 @@ python cerebrum/run_agent.py \
 Or run agents that are uploaded to agenthub by passing the author and agent name
 
 ```
-python cerebrum/run_agent.py \
+run-agent \
     --mode remote \
     --agent_author <author> \
     --agent_name <agent_name> \
@@ -122,7 +169,7 @@ python cerebrum/run_agent.py \
 For example, to run the test_agent in the agenthub, you can run:
 
 ```
-python cerebrum/run_agent.py \
+run-agent \
     --mode remote \
     --agent_author example \
     --agent_name test_agent \
@@ -130,18 +177,6 @@ python cerebrum/run_agent.py \
     --task "What is the capital of United States?" \
     --agenthub_url https://app.aios.foundation
 ```
-
-
-### Useful commands to use
-#### Agents
-- [List agents from agenthub](./cerebrum/commands/list_agenthub_agents.py)
-- [Download agents](./cerebrum/commands/download_agent.py)
-- [Upload agent](./cerebrum/commands/upload_agent.py)
-
-#### Tools
-- [List tools from toolhub](./cerebrum/commands/list_toolhub_tools.py)
-- [List tools from local](./cerebrum/commands/list_local_tools.py)
-- [Upload tool](./cerebrum/commands/upload_tool.py)
 
 
 ## 🚀 Develop and customize new agents
@@ -152,17 +187,17 @@ This guide will walk you through creating and publishing your own agents for AIO
 First, let's look at how to organize your agent's files. Every agent needs three essential components:
 
 ```
-author/
+author_name/
 └── agent_name/
       │── entry.py        # Your agent's main logic
       │── config.json     # Configuration and metadata
       └── meta_requirements.txt  # Additional dependencies
 ```
 
-For example, if your name is 'example' and you're building a demo_agent that searches and summarizes articles, your folder structure would look like this:
+For example, if your name is 'demo_author' and you're building a demo_agent that searches and summarizes articles, your folder structure would look like this:
 
 ```
-example/
+demo_author/
    └── demo_agent/
          │── entry.py
          │── config.json
@@ -237,7 +272,7 @@ To load a local tool in your code:
 
 ```python
 from cerebrum.tool import AutoTool
-tool = AutoTool.from_preloaded("local/my_custom_tool", local=True)
+tool = AutoTool.from_preloaded("google/google_search", local=True)
 ```
 
 If you would like to create your new tools, refer to [How to develop new tools](#develop-and-publish-new-tools)
@@ -262,7 +297,8 @@ demo_author/
     └── config.json   # Tool configuration and metadata
 ```
 
-> [!IMPORTANT] To use the agents in your local device, you need to put the tool folder under the cerebrum/tool/core folder
+> [!IMPORTANT]
+> To use the agents in your local device, you need to put the tool folder under the cerebrum/tool/core folder and register your tool in the cerebrum/tool/core/registry.py
 
 ### Create Tool Class
 In `entry.py`, you'll need to implement a tool class which is identified in the config.json with two essential methods:

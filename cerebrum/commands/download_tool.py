@@ -4,10 +4,18 @@ import argparse
 import sys
 
 def main():
-    parser = argparse.ArgumentParser(description="Upload tools")
+    parser = argparse.ArgumentParser(description="Download tools")
     parser.add_argument(
-        "--tool_path",
+        "--tool_author",
         required=True
+    )
+    parser.add_argument(
+        "--tool_name",
+        required=True
+    )
+    parser.add_argument(
+        "--tool_version",
+        required=False
     )
     parser.add_argument(
         "--toolhub_url",
@@ -18,9 +26,8 @@ def main():
 
     manager = ToolManager(args.toolhub_url)
 
-    tool_package = manager.package_tool(args.tool_path)
-
-    manager.upload_tool(tool_package)
+    tool = manager.download_tool(args.tool_author, args.tool_name, args.tool_version)
+    print(tool)
 
 if __name__ == "__main__":
     sys.exit(main())

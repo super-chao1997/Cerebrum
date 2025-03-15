@@ -1,4 +1,4 @@
-from cerebrum.llm.apis import llm_chat, llm_call_tool
+from cerebrum.llm.apis import llm_chat, llm_call_tool, llm_chat_with_json_output
 from cerebrum.interface import AutoTool
 import os
 import json
@@ -11,7 +11,10 @@ class DemoAgent:
     def __init__(self, agent_name):
         self.agent_name = agent_name
         self.config = self.load_config()
-        self.tools, self.tool_info = AutoTool.from_batch_preload(self.config["tools"]).values()
+        self.tools = [
+            tool.get_tool_call_format()
+            for tool in AutoTool.from_batch_preloaded(self.config["tools"])
+        ]
 
         self.plan_max_fail_times = 3
         self.tool_call_max_fail_times = 3
@@ -47,7 +50,7 @@ class DemoAgent:
 
         plan_instruction = "".join(
             [
-                f"You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ",
+                f"You are given the available tools from the tool list: {json.dumps(self.tools)} to help you solve problems. ",
                 "Generate a plan with comprehensive yet minimal steps to fulfill the task. ",
                 "The plan must follow the json format as below: ",
                 "[",
@@ -79,14 +82,15 @@ class DemoAgent:
 
     def automatic_workflow(self):
         for i in range(self.plan_max_fail_times):
-            response = self.send_request(
-                agent_name=self.agent_name,
-                query=LLMQuery(
-                    messages=self.messages, tools=None, message_return_type="json"
-                ),
-            )["response"]
+            response = llm_chat_with_json_output(
+                messages=self.messages,
+                message_return_type="json"
+            )["response"]["response_message"]
 
-            workflow = self.check_workflow(response.response_message)
+            try:
+                workflow = json.loads(response)
+            except:
+                workflow = None
 
             self.rounds += 1
 
@@ -105,7 +109,7 @@ class DemoAgent:
     def manual_workflow(self):
         workflow = [
             {
-                "action_type": "tool_use",
+                "action_type": "call_tool",
                 "action": "Search for relevant papers",
                 "tool_use": ["demo_author/arxiv"],
             },
@@ -157,7 +161,7 @@ class DemoAgent:
                     else:
                         selected_tools = None
 
-                    if action_type == "tool_use":
+                    if action_type == "call_tool":
                         response = llm_call_tool(
                             agent_name=self.agent_name,
                             messages=self.messages,
@@ -184,7 +188,7 @@ class DemoAgent:
                     "rounds": self.rounds,
                 }
 
-            else:
+            else:   
                 return {
                     "agent_name": self.agent_name,
                     "result": "Failed to generate a valid workflow in the given times.",

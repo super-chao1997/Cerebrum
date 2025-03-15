@@ -8,6 +8,8 @@ from rich.box import ROUNDED
 from cerebrum.config.config_manager import config
 from cerebrum.manager.tool import ToolManager
 
+import sys
+
 def list_local_tools():
     console = Console()
     
@@ -62,5 +64,8 @@ def list_local_tools():
     console.print(usage)
     console.print("\n")  # Add some space after the summary
 
-if __name__ == "__main__":
+def main(): 
     list_local_tools()
+
+if __name__ == "__main__":
+    sys.exit(main())

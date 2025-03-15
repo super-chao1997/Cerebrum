@@ -1,16 +1,21 @@
 from cerebrum.manager.agent import AgentManager
 
 import argparse
+import sys
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Upload agents")
+def main():
+    parser = argparse.ArgumentParser(description="Download agents")
     parser.add_argument(
-        "--author",
+        "--agent_author",
         required=True
     )
     parser.add_argument(
-        "--name",
+        "--agent_name",
         required=True
+    )
+    parser.add_argument(
+        "--agent_version",
+        required=False
     )
     parser.add_argument(
         "--agenthub_url",
@@ -21,6 +26,8 @@ if __name__ == "__main__":
 
     manager = AgentManager(args.agenthub_url)
 
-    agent = manager.download_agent(args.author, args.name)
+    agent = manager.download_agent(args.agent_author, args.agent_name, args.agent_version)
     print(agent)
-    
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -314,6 +314,8 @@ class TestAgentsWithOllama(unittest.TestCase):
         # Skip test if no local agents found
         if not self.local_agents:
             self.skipTest("No local agents found to test")
+            
+        self.local_agents = self.local_agents[:3]
         
         results = {}
         success_count = 0

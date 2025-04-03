@@ -5,7 +5,7 @@ from typing import List
 
 from datasets import load_dataset
 
-from ..agents.pure_llm import PureLLM
+from ..agents.react import PureLLM
 from ..experiment_core import MetaData, AGENT_TYPE_MAPPING_AIOS, run_inference
 from ..utils import get_parser
 

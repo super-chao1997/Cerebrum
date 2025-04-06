@@ -16,17 +16,24 @@ class MCPClient(BaseMCPClient):
     """
 
     @classmethod
-    def from_smithery(cls, pkg_name: str, suffix_args: List[str] = []):
+    def from_smithery(
+        cls,
+        pkg_name: str,
+        description: str = "",
+        suffix_args: List[str] = [],
+        env: Dict[str, str] = None,
+    ):
         server_params = StdioServerParameters(
             command="npx",
             args=["-y", "@smithery/cli@latest", "run", pkg_name, *suffix_args],
+            env=env,
         )
         # CONSOLE.log(f"Use MCP: {pkg_name} from smithery")
-        return cls(pkg_name, server_params)
+        return cls(pkg_name, description, server_params)
 
     @classmethod
     def from_npx(
-        cls, pkg_name: str, prefix_args: List[str] = [], suffix_args: List[str] = []
+        cls, pkg_name: str, description: str = "", prefix_args: List[str] = [], suffix_args: List[str] = []
     ):
         server_params = StdioServerParameters(
             command="npx",
@@ -34,7 +41,7 @@ class MCPClient(BaseMCPClient):
             # **extra_args
         )
         print(f"Use MCP: {pkg_name} from npx")
-        return cls(pkg_name, server_params)
+        return cls(pkg_name, description, server_params)
 
     @classmethod
     def from_docker(
@@ -59,9 +66,10 @@ class MCPClient(BaseMCPClient):
         # CONSOLE.log(f"Use MCP: {image_name} from docker")
         return cls(image_name, server_params)
 
-    def __init__(self, name: str, server_params: StdioServerParameters):
+    def __init__(self, name: str, description: str = "", server_params: StdioServerParameters = None):
         """Initialize the MCP client with server parameters"""
         self.__name = name
+        self.__description = description
         self.server_params = server_params
         self.session = None
         self.read = None
@@ -72,6 +80,10 @@ class MCPClient(BaseMCPClient):
     @property
     def name(self) -> str:
         return self.__name
+    
+    @property
+    def description(self) -> str:
+        return self.__description
 
     async def __aenter__(self):
         await self.connect()
@@ -136,20 +148,62 @@ class MCPClient(BaseMCPClient):
             return response.content[0].text
 
         return callable
-
-    async def hint(self) -> str:
+    
+    async def get_tool_hints_by_name(self, tool_name: str = None) -> str:
         tools = await self.get_available_tools()
-        hint = ""
         for tool in tools:
-            hint += f"- {tool.name}: {tool.description}\n"
-        return hint
-
-    async def tool_schemas(self) -> List[dict]:
+            if tool.name == tool_name:
+                return f"- {tool.name}: {tool.description}\n"
+        return ""
+    
+    async def get_tool_schemas_by_name(self, tool_name: str = None) -> List[dict]:
+        tools = await self.get_available_tools()
+        for tool in tools:
+            if tool.name == tool_name:
+                schema = tool.inputSchema
+                if "$schema" in schema:
+                    schema.pop("$schema")
+                return schema
+        return []
+    
+    async def get_all_tool_hints(self) -> List[str]:
+        tools = await self.get_available_tools()
+        hints = []
+        for tool in tools:
+            hints.append(f"{tool.name}: {tool.description}\n")
+        return hints
+    
+    async def get_all_tool_information(self) -> List[str]:
+        tools = await self.get_available_tools()
+        tool_information = []
+        for tool in tools:
+            schema = tool.inputSchema
+            openai_tool_schema = {
+                "type": "function",
+                "function": {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": schema,
+                }
+            }
+            
+            if "$schema" in schema:
+                schema.pop("$schema")
+            tool_information.append({
+                "name": tool.name,
+                "description": tool.description,
+                "hint": f"{tool.name}: {tool.description}",
+                "schema": openai_tool_schema,
+            })
+        return tool_information
+    
+    async def get_all_tool_schemas(self) -> List[dict]:
         openai_tools = []
         tools = await self.get_available_tools()
         for tool in tools:
             schema = tool.inputSchema
-            schema.pop("$schema")
+            if "$schema" in schema:
+                schema.pop("$schema")
             openai_tools.append(
                 {
                     "type": "function",

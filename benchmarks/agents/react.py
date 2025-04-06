@@ -73,84 +73,6 @@ class ReActAgent:
             client_descriptions += f"- {client.name}: {client.description}\n"
         return client_descriptions
     
-    
-    def generator_tool_call_id():
-        """
-        Generate a unique identifier for a tool call.
-
-        This function creates a new UUID (Universally Unique Identifier) and returns it as a string.
-
-        Returns:
-            str: A unique tool call ID.
-        
-        Example:
-            ```python
-            tool_call_id = generator_tool_call_id()
-            print(tool_call_id)  # Example output: 'f3f2e850-b5d4-11ef-ac7e-96584d5248b2'
-            ```
-        """
-        return str(uuid.uuid4())
-
-    def decode_litellm_tool_calls(self,response):
-        """
-        Decode tool call responses from LiteLLM API format.
-
-        Args:
-            response: The response object from LiteLLM API.
-
-        Returns:
-            list: A list of dictionaries, each containing:
-                - "name": The name of the function being called.
-                - "parameters": The arguments passed to the function.
-                - "id": The unique identifier of the tool call.
-
-        Example:
-            ```python
-            response = <LiteLLM API response>
-            decoded_calls = decode_litellm_tool_calls(response)
-            print(decoded_calls)  
-            # Output: [{'name': 'translate', 'parameters': {'text': 'hello', 'lang': 'fr'}, 'id': 'uuid1234'}]
-            ```
-        """
-        decoded_tool_calls = []
-        
-        if response.choices[0].message.content is None:
-            assert response.choices[0].message.tool_calls is not None
-            tool_calls = response.choices[0].message.tool_calls
-
-            for tool_call in tool_calls:
-                parameters = tool_call.function.arguments
-                if isinstance(parameters, str):
-                    parameters = json.loads(parameters)
-                decoded_tool_calls.append(
-                    {
-                        "name": tool_call.function.name,
-                        "parameters": parameters,
-                        "id": tool_call.id
-                    }
-                )
-        else:
-            assert response.choices[0].message.content is not None
-            
-            # breakpoint()
-            tool_calls = response.choices[0].message.content
-            if isinstance(tool_calls, str):
-                tool_calls = json.loads(tool_calls)
-            
-            if not isinstance(tool_calls, list):
-                tool_calls = [tool_calls]
-                
-            for tool_call in tool_calls:
-                decoded_tool_calls.append(
-                    {
-                        "name": tool_call["name"],
-                        "parameters": tool_call["arguments"],
-                        "id": self.generator_tool_call_id()
-                    }
-                )
-            
-        return decoded_tool_calls
-    
     def run_swebench(self, input_str: str):
         messages = [
             {"content": "You are a helpful assistant that can answer questions and help with tasks.", "role": "system"},
@@ -245,12 +167,12 @@ class ReActAgent:
         
         llms = [
             {
-                "name": "gpt-4o",
-                "backend": "openai",
+                # "name": "gpt-4o",
+                # "backend": "openai",
+                "name": "gemini-2.0-flash",
+                "backend": "google",
             }
         ]
-        
-        breakpoint()
         
         tool_hints = self.get_all_tool_hints(tool_information)
         
@@ -290,19 +212,19 @@ But you do not need to call a tool every time, so be careful.
             """
             breakpoint()
             messages.append({"content": step_instructions, "role": "user"})
-            # response = llm_chat(
-            #     agent_name=self.agent_name,
-            #     messages=messages,
-            #     llms=llms
-            # )
-            
-            # step_response = response["response"]["response_message"]
-            response = completion(
-                model="gemini/gemini-2.0-flash",
+            response = llm_chat(
+                agent_name=self.agent_name,
                 messages=messages,
-                temperature=1.0,
+                llms=llms
             )
-            step_response = response.choices[0].message.content
+            
+            step_response = response["response"]["response_message"]
+            # response = completion(
+            #     model="gemini/gemini-2.0-flash",
+            #     messages=messages,
+            #     temperature=1.0,
+            # )
+            # step_response = response.choices[0].message.content
             
             breakpoint()
             
@@ -324,24 +246,24 @@ But you do not need to call a tool every time, so be careful.
                 
                 breakpoint()
                 messages.append({"content": f"Identify the tool parameters of tool {tool_name} to solve the problem for the current step.", "role": "user"})
-                # tool_call_response = llm_chat_with_tool_call_output(
-                #     agent_name=self.agent_name,
-                #     messages=messages,
-                #     llms=llms,
-                #     tools=tool_schemas,
-                # )
-                # tool_calls = tool_call_response["response"]["tool_calls"]
-                tool_call_response = completion(
-                    model="gemini/gemini-2.0-flash",
+                tool_call_response = llm_chat_with_tool_call_output(
+                    agent_name=self.agent_name,
                     messages=messages,
-                    temperature=1.0,
+                    llms=llms,
                     tools=tool_schemas,
-                    tool_choice="required"
                 )
+                tool_calls = tool_call_response["response"]["tool_calls"]
+                # tool_call_response = completion(
+                #     model="gemini/gemini-2.0-flash",
+                #     messages=messages,
+                #     temperature=1.0,
+                #     tools=tool_schemas,
+                #     tool_choice="required"
+                # )
+                # tool_calls = self.decode_litellm_tool_calls(tool_call_response)
                 
                 breakpoint()
                 # tool_calls = tool_call_response.choices[0].message.tool_calls
-                tool_calls = self.decode_litellm_tool_calls(tool_call_response)
                 tool_call_result = ""
                 for tool_call in tool_calls:
                     tool_name = tool_call["name"]
@@ -350,6 +272,8 @@ But you do not need to call a tool every time, so be careful.
                     tool_call_result += f"Tool {tool_name} called with arguments: {tool_args}. Result: {tool_result}\n"
                     
                 messages.append({"content": tool_call_result, "role": "assistant"})
+                
+                breakpoint()
 
 async def main():
     mcp_pool = MCPPool()

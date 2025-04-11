@@ -7,28 +7,32 @@ from tqdm import tqdm
 def run_evaluation(input_file: str, output_file: str, data_name: str, split: str):
     dataset = load_dataset(data_name, "2023_all", split=split)
 
-    with open(input_file, "r", encoding="utf-8") as file:
-        predictions = json.load(file)
+    # with open(input_file, "r", encoding="utf-8") as file:
+    #     predictions = json.load(file)
 
-    right_num = 0
-    error_predictions = []
-    for prediction, data in tqdm(zip(predictions, dataset)):
-        if prediction["result"] == data["Final answer"]:
-            right_num += 1
-        else:
-            error_predictions.append({
-                "task_id": data["task_id"],
-                "error_answer": prediction["result"],
-                "right_answer": data["Final answer"],
-            })
+    # right_num = 0
+    # error_predictions = []
+    # for prediction, data in tqdm(zip(predictions, dataset)):
+    #     if prediction["result"] == data["Final answer"]:
+    #         right_num += 1
+    #     else:
+    #         error_predictions.append({
+    #             "task_id": data["task_id"],
+    #             "error_answer": prediction["result"],
+    #             "right_answer": data["Final answer"],
+    #         })
 
-    with open(output_file, "w", encoding="utf-8") as file:
-        json.dump(error_predictions, file, ensure_ascii=False, indent=4)
-
-    print(f"Total num: {len(predictions)} \n"
-               f"             Right num: {right_num} \n"
-               f"             Right Rate: {right_num/len(predictions)}"
-               , level="info")
+    # with open(output_file, "w", encoding="utf-8") as file:
+    #     json.dump(error_predictions, file, ensure_ascii=False, indent=4)
+    
+    for data in tqdm(dataset):
+        answer = data["Final answer"]
+        breakpoint()
+        
+    # print(f"Total num: {len(predictions)} \n"
+    #            f"             Right num: {right_num} \n"
+    #            f"             Right Rate: {right_num/len(predictions)}"
+    #            , level="info")
 
 
 if __name__ == '__main__':

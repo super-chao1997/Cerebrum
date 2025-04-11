@@ -9,7 +9,7 @@
     ],
     "meta": {
         "author": "demo_author",
-        "version": "0.0.1",
+        "version": "0.0.5",
         "license": "CC0"
     },
     "build": {

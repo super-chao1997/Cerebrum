@@ -1,10 +1,20 @@
-from cerebrum.tool.mcp_tool import mcp_pool
+from cerebrum.tool.mcp_tool import MCPPool, MCPClient
 from cerebrum.llm.apis import llm_chat_with_tool_call_output
 
 import asyncio
 # print(mcp.name)
 
 async def main():
+    mcp_pool = MCPPool()
+    mcp_pool.add_mcp_client(
+        "playwright",
+        MCPClient.from_npx(
+            "@playwright/mcp@latest",
+            suffix_args=[
+                "--headless"
+            ],
+        ),
+    )
     await mcp_pool.start()
     
     # playwright_client = mcp_pool.get_mcp_client("playwright")

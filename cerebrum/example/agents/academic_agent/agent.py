@@ -159,7 +159,7 @@ class AcademicAgent:
                     else:
                         selected_tools = None
 
-                    breakpoint()
+                    # breakpoint()
                     
                     if action_type == "call_tool":
                         response = llm_call_tool(

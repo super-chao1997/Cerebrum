@@ -1,14 +1,14 @@
 from typing import Any, Callable
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 from tqdm import tqdm
 
-from .agents.pure_llm import PureLLM
+from .agents.react import ReActAgent
 
 AGENT_TYPE_MAPPING_AIOS = {
-    "swe:llm": PureLLM,
-    "humaneval:llm": PureLLM,
-    "gaia:llm": PureLLM,
+    "swe:react": ReActAgent,
+    "humaneval:react": ReActAgent,
+    "gaia:react": ReActAgent,
 }
 
 

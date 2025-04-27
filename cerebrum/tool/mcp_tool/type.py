@@ -15,6 +15,12 @@ class BaseMCPClient(ABC):
     def name(self) -> str:
         """The name of the MCP client"""
         pass
+    
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        """The description of the MCP client"""
+        pass
 
     @abstractmethod
     async def get_available_tools(self) -> List[Tool]:
@@ -36,17 +42,39 @@ class BaseMCPClient(ABC):
             A callable async function that executes the specified tool
         """
         pass
-
+    
+    
     @abstractmethod
-    async def hint(self) -> str:
+    async def get_tool_hints_by_name(self, tool_name: str = None) -> str:
         """
-        Retrieve a hint for the MCP server.
+        Retrieve a hint for a specific tool from the MCP server.
+        """
+        pass
+    
+    @abstractmethod
+    async def get_all_tool_hints(self) -> str:
+        """
+        Retrieve hints for all tools from the MCP server.
         """
         pass
 
     @abstractmethod
-    async def tool_schemas(self) -> List[dict]:
+    async def get_tool_schemas_by_name(self, tool_name: str = None) -> List[dict]:
         """
-        Retrieve a list of tool schemas from the MCP server.
+        Retrieve schemas for a specific tool from the MCP server.
+        """
+        pass
+    
+    @abstractmethod
+    async def get_all_tool_schemas(self) -> List[dict]:
+        """
+        Retrieve schemas for all tools from the MCP server.
+        """
+        pass
+    
+    @abstractmethod
+    async def get_all_tool_information(self) -> List[dict]:
+        """
+        Retrieve information for all tools from the MCP server.
         """
         pass

@@ -1,3 +1,5 @@
 requests
 platformdirs
 pydantic
+mcp
+datasets

@@ -2,7 +2,7 @@ from cerebrum.llm.apis import llm_chat
 
 from litellm import completion
 
-class PureLLM:
+class CoT:
     def __init__(self, on_aios: bool = True):
         self.agent_name = "llm"
         self.on_aios = on_aios

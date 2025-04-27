@@ -1,7 +1,9 @@
 from .mcp_client import MCPClient
 from .pool import MCPPool
 
-mcp_pool = MCPPool()
+__all__ = ["MCPClient", "MCPPool"]
+
+# mcp_pool = MCPPool()
 
 # if os.getenv("BRAVE_API_KEY"):
 #     TOOLS.add_mcp_client(
@@ -72,12 +74,12 @@ mcp_pool = MCPPool()
 #     ),
 # )
 
-mcp_pool.add_mcp_client(
-    "playwright",
-    MCPClient.from_npx(
-        "@playwright/mcp@latest",
-        suffix_args=[
-            "--headless"
-        ],
-    ),
-)
+# mcp_pool.add_mcp_client(
+#     "playwright",
+#     MCPClient.from_npx(
+#         "@playwright/mcp@latest",
+#         suffix_args=[
+#             "--headless"
+#         ],
+#     ),
+# )

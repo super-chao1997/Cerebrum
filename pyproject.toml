@@ -51,6 +51,7 @@ list-toolhub-tools = "cerebrum.commands.list_toolhub_tools:main"
 list-local-tools = "cerebrum.commands.list_local_tools:main"
 download-tool = "cerebrum.commands.download_tool:main"
 upload-tool = "cerebrum.commands.upload_tool:main"
+run-computer-use-agent = "cerebrum.run_cua:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cerebrum"]

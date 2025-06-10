@@ -16,6 +16,10 @@ import matplotlib.pyplot as plt
 from cerebrum.llm.apis import llm_chat, llm_chat_with_json_output, llm_chat_with_tool_call_output
 from cerebrum.utils.utils import _parse_json_output
 
+from cerebrum.utils.communication import get_mcp_server_path, aios_kernel_url
+
+mcp_server_path = get_mcp_server_path(aios_kernel_url)
+
 import base64
 
 import xml.etree.ElementTree as ET
@@ -61,14 +65,14 @@ class CUAgent:
         # Initialize modules
         self.planner_llms = [
             {
-                "name": "gpt-4.1-mini",
+                "name": "gpt-4o",
                 "backend": "openai",
             }
         ]
         
         self.perceiver_llms = [
             {
-                "name": "gpt-4.1-mini",
+                "name": "gpt-4o",
                 "backend": "openai",
             }
         ]
@@ -167,12 +171,12 @@ class CUAgent:
         self.reasoner.reset()
         
         # Reset VM
-        await self.actor.mcp_client.call_tool("reset_vm", {"task_config": self.task_config})
+        # await self.actor.mcp_client.call_tool("reset_vm", {"task_config": self.task_config})
         
         rounds = 0
         
         # Start recording
-        await self.actor.start_recording()
+        # await self.actor.start_recording()
         
         # Generate plan
         self.plan = self.planner.plan(task_input)
@@ -243,12 +247,13 @@ class CUAgent:
             time.sleep(1)
             
         # Stop recording
-        await self.actor.stop_recording(
-            self.cache_dir + time.strftime("/recording-%Y%m%d-%H%M%S.mp4")
-        )
+        # await self.actor.stop_recording(
+        #     self.cache_dir + time.strftime("/recording-%Y%m%d-%H%M%S.mp4")
+        # )
         
         # Evaluate performance
-        score = await self.actor.evaluate(self.action_history)
+        # score = await self.actor.evaluate(self.action_history)
+        score = 0
         
         # Save trajectories
         trajectories = {
@@ -259,10 +264,24 @@ class CUAgent:
         }
         self.save_trajectories(trajectories)
         
+        summarization_prompt = f"""
+        You are a helpful assistant that summarizes the final result of the task.
+        Here is the task: {self.task_config["instruction"]} and here are the actions you have taken: {self.history}
+        Please summarize the final result of the task.
+        """
+        final_result = llm_chat(
+            agent_name="summarizer",
+            llms=self.orchestrator_llms,
+            messages=[
+                {"role": "user", "content": summarization_prompt},
+            ]
+        )["response"]["response_message"]
+        
         return {
             "agent_name": "cu_agent",
             "rounds": rounds,
-            "score": score
+            "result": final_result,
+            # "score": score
         }
 
 async def run_cu_agent(task_config: dict, mcp_server_path: str):
@@ -273,14 +292,20 @@ async def run_cu_agent(task_config: dict, mcp_server_path: str):
             mcp_client=mcp_client,
             task_config=task_config
         )
-        result = await agent.run(task_config["instruction"])
+        response = await agent.run(task_config["instruction"])
+        result = response["result"]
         print(result)
-        return result
             
     finally:
         await mcp_client.close()
         
 if __name__ == "__main__":
     import sys
+    
     task_input = sys.argv[1]
-    asyncio.run(run_cu_agent(sys.argv[1]))
+    task_config = {
+        "instruction": task_input,
+        "domain": "chrome", 
+        "task_id": 0,
+    }
+    asyncio.run(run_cu_agent(task_config, mcp_server_path))

@@ -15,6 +15,7 @@ AIOS is the AI Agent Operating System, which embeds large language model (LLM) i
 The AIOS-Agent SDK is designed for agent users and developers, enabling them to build and run agent applications by interacting with the [AIOS kernel](https://github.com/agiresearch/AIOS.git). 
 
 ## 📰 News
+- **[2025-05-24]** 🔥 The computer-use agent: [LiteCUA](https://arxiv.org/abs/2505.18829) has been integrated into Cerebrum!
 - **[2024-11-26]** 🔥 Cerebrum is available for public release on PyPI!
 
 ## Installation
@@ -183,6 +184,18 @@ run-agent \
     --agenthub_url https://app.aios.foundation
 ```
 
+### Run computer-use agent
+Make sure you have followed AIOS to install virtualized environment, then you can use the following command to run: 
+
+```
+run-computer-use-agent <YOUR TASK>
+```
+
+or run 
+
+```
+python cerebrum/run_cua.py <YOUR TASK>
+```
 
 ## 🚀 Develop and customize new agents
 
@@ -409,38 +422,44 @@ python cerebrum/commands/upload_tool.py \
 ## Supported LLM Cores
 | Provider 🏢 | Model Name 🤖 | Open Source 🔓 | Model String ⌨️ | Backend ⚙️ | Required API Key |
 |:------------|:-------------|:---------------|:---------------|:---------------|:----------------|
-| Anthropic | Claude 3.5 Sonnet | ❌ | claude-3-5-sonnet-20241022 |anthropic | ANTHROPIC_API_KEY |
-| Anthropic | Claude 3.5 Haiku | ❌ | claude-3-5-haiku-20241022 |anthropic | ANTHROPIC_API_KEY |
-| Anthropic | Claude 3 Opus | ❌ | claude-3-opus-20240229 |anthropic | ANTHROPIC_API_KEY |
-| Anthropic | Claude 3 Sonnet | ❌ | claude-3-sonnet-20240229 |anthropic | ANTHROPIC_API_KEY |
-| Anthropic | Claude 3 Haiku | ❌ | claude-3-haiku-20240307 |anthropic | ANTHROPIC_API_KEY |
-| OpenAI | GPT-4 | ❌ | gpt-4 |openai| OPENAI_API_KEY |
-| OpenAI | GPT-4 Turbo | ❌ | gpt-4-turbo |openai| OPENAI_API_KEY |
-| OpenAI | GPT-4o | ❌ | gpt-4o |openai| OPENAI_API_KEY |
-| OpenAI | GPT-4o mini | ❌ | gpt-4o-mini |openai| OPENAI_API_KEY |
-| OpenAI | GPT-3.5 Turbo | ❌ | gpt-3.5-turbo |openai| OPENAI_API_KEY |
-| Google | Gemini 1.5 Flash | ❌ | gemini-1.5-flash |google| GEMINI_API_KEY |
-| Google | Gemini 1.5 Flash-8B | ❌ | gemini-1.5-flash-8b |google| GEMINI_API_KEY |
-| Google | Gemini 1.5 Pro | ❌ | gemini-1.5-pro |google| GEMINI_API_KEY |
-| Google | Gemini 1.0 Pro | ❌ | gemini-1.0-pro |google| GEMINI_API_KEY |
-| Groq | Llama 3.2 90B Vision | ✅ | llama-3.2-90b-vision-preview |groq| GROQ_API_KEY |
-| Groq | Llama 3.2 11B Vision | ✅ | llama-3.2-11b-vision-preview |groq| GROQ_API_KEY |
-| Groq | Llama 3.1 70B | ✅ | llama-3.1-70b-versatile |groq| GROQ_API_KEY |
-| Groq | Llama Guard 3 8B | ✅ | llama-guard-3-8b |groq| GROQ_API_KEY |
-| Groq | Llama 3 70B | ✅ | llama3-70b-8192 |groq| GROQ_API_KEY |
-| Groq | Llama 3 8B | ✅ | llama3-8b-8192 |groq| GROQ_API_KEY |
-| Groq | Mixtral 8x7B | ✅ | mixtral-8x7b-32768 |groq| GROQ_API_KEY |
-| Groq | Gemma 7B | ✅ | gemma-7b-it |groq| GROQ_API_KEY |
-| Groq | Gemma 2B | ✅ | gemma2-9b-it |groq| GROQ_API_KEY |
-| Groq | Llama3 Groq 70B | ✅ | llama3-groq-70b-8192-tool-use-preview |groq| GROQ_API_KEY |
-| Groq | Llama3 Groq 8B | ✅ | llama3-groq-8b-8192-tool-use-preview |groq| GROQ_API_KEY |
-| ollama | [All Models](https://ollama.com/search) | ✅ | model-name |ollama| - |
-| vLLM | [All Models](https://docs.vllm.ai/en/latest/) | ✅ | model-name |vllm| - |
+| Anthropic | [All Models](https://makersuite.google.com/app/apikey) | ❌ | model-name | anthropic | ANTHROPIC_API_KEY |
+| OpenAI | [All Models](https://platform.openai.com/docs/models) | ✅ | model-name | openai | OPENAI_API_KEY |
+| Deepseek | [All Models](https://api-docs.deepseek.com/) | ✅ | model-name | deepseek | DEEPSEEK_API_KEY |
+| Google | [All Models](https://makersuite.google.com/app/apikey) | ❌ | model-name | gemini| GEMINI_API_KEY |
+| Groq | [All Models](https://console.groq.com/keys) | ✅ | model-name | groq | GROQ_API_KEY |
 | HuggingFace | [All Models](https://huggingface.co/models/) | ✅ | model-name |huggingface| HF_HOME |
+| ollama | [All Models](https://ollama.com/search) | ✅ | model-name | ollama | - |
+| vLLM | [All Models](https://docs.vllm.ai/en/latest/) | ✅ | model-name | vllm | - |
+| Novita | [All Models](https://novita.ai/models/llm) | ✅ | model-name | novita | NOVITA_API_KEY |
 
 
 ## 🖋️ References
 ```
+@article{mei2025litecua,
+  title={LiteCUA: Computer as MCP Server for Computer-Use Agent on AIOS},
+  author={Mei, Kai and Zhu, Xi and Gao, Hang and Lin, Shuhang and Zhang, Yongfeng},
+  journal={arXiv preprint arXiv:2505.18829},
+  year={2025}
+}
+@article{xu2025mem,
+  title={A-Mem: Agentic Memory for LLM Agents},
+  author={Xu, Wujiang and Liang, Zujie and Mei, Kai and Gao, Hang and Tan, Juntao and Zhang, Yongfeng},
+  journal={arXiv:2502.12110},
+  year={2025}
+}
+@inproceedings{rama2025cerebrum,
+  title={Cerebrum (AIOS SDK): A Platform for Agent Development, Deployment, Distribution, and Discovery}, 
+  author={Balaji Rama and Kai Mei and Yongfeng Zhang},
+  booktitle={2025 Annual Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics},
+  year={2025}
+}
+@inproceedings{shi2025from,
+  title={From Commands to Prompts: {LLM}-based Semantic File System for AIOS},
+  author={Zeru Shi and Kai Mei and Mingyu Jin and Yongye Su and Chaoji Zuo and Wenyue Hua and Wujiang Xu and Yujie Ren and Zirui Liu and Mengnan Du and Dong Deng and Yongfeng Zhang},
+  booktitle={The Thirteenth International Conference on Learning Representations},
+  year={2025},
+  url={https://openreview.net/forum?id=2G021ZqUEZ}
+}
 @article{mei2024aios,
   title={AIOS: LLM Agent Operating System},
   author={Mei, Kai and Li, Zelong and Xu, Shuyuan and Ye, Ruosong and Ge, Yingqiang and Zhang, Yongfeng}
